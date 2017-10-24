@@ -30,12 +30,16 @@ def main():
     print("5, 6. Geometric progression")
     print(burst(1,2,15))
     print("______\n")
+    """
 
-    print("7. Output a matrix of randon numbers from modulo ring.")
-    print(matrix(56,4,5))
+    print("7. Output a matrix of randon numbers from modulo ring:")
+    print(matrix(56,4,5,'u'))
+    print("\n8. The same but triangle:")
+    print(matrix(56,4,5,'t'))
+    print("\n9. And diagonal one now:")
+    print(matrix(56,4,5,'d'))
     print("______\n")
 
-    """
 
 
 
@@ -155,7 +159,7 @@ def burst(base, step, length):
     return out_seq_str
 
 
-def matrix(base,row,col):
+def matrix(base,row,col,shape):
     """
     Outputs a matrix *row*x*col* of random integers modulo *base*.
     """
@@ -163,18 +167,41 @@ def matrix(base,row,col):
     ibase = int(base)
     irow = int(row)
     icol = int(col)
+    i = 0
+    j = 0
     out_seq_str = ""
     if ibase < 2:
         return "Error: Nonsense modulo, choose integer > 1."
     if irow < 1 or icol < 1:
         return "Error: Matrix is too small."
+    if shape == 'u':
+        triangle = False
+        diagonal = False
+    elif shape == 't':
+        triangle = True
+        diagonal = False
+        icol = min(icol,irow)
+        irow = min(icol,irow)
+    elif shape == 'd':
+        triangle = True
+        diagonal = True
+        icol = min(icol,irow)
+        irow = min(icol,irow)
+    else:
+        return "Error: unknown matrix shape; try matrix(*num,*num,*num,'u')"
 
-    while irow > 0:
+    while j < irow:
         for i in range(icol):
-            out_seq_str += str(int(r.random() * 1000)  % ibase) + "\t"
-        if irow > 1:
+            if triangle and i < j:
+                out_seq_str += str(0) + "\t"
+                continue
+            if diagonal and i != j:
+                out_seq_str += str(0) + "\t"
+                continue
+            out_seq_str += str((int(r.random() * 1000) % ibase) + 1) + "\t"
+        if j < irow - 1:
             out_seq_str += "\n"
-        irow -= 1
+        j += 1
 
     return out_seq_str
 
