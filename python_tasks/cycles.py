@@ -10,7 +10,6 @@ import math as m
 import random as r
 
 def main():
-    """
     print("1. Sequence from 1 to 10")
     print(int_seq(10))
     print("______\n")
@@ -30,13 +29,12 @@ def main():
     print("5, 6. Geometric progression")
     print(burst(1,2,15))
     print("______\n")
-    """
 
     print("7. Output a matrix of randon numbers from modulo ring:")
     print(matrix(56,4,5,'u'))
     print("\n8. The same but triangle:")
     print(matrix(56,4,5,'t'))
-    print("\n9. And diagonal one now:")
+    print("\n9. And the diagonal one now:")
     print(matrix(56,4,5,'d'))
     print("______\n")
 
