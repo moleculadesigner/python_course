@@ -7,8 +7,10 @@ Author:
 Danila Iakovlev
 """
 import math as m
+import random as r
 
 def main():
+    """
     print("1. Sequence from 1 to 10")
     print(int_seq(10))
     print("______\n")
@@ -28,6 +30,14 @@ def main():
     print("5, 6. Geometric progression")
     print(burst(1,2,15))
     print("______\n")
+
+    print("7. Output a matrix of randon numbers from modulo ring.")
+    print(matrix(56,4,5))
+    print("______\n")
+
+    """
+
+
 
 
 def int_seq(lim):
@@ -143,7 +153,30 @@ def burst(base, step, length):
 
     out_seq_str += ("\n            Sum: " + str(burst_sum))
     return out_seq_str
-    
+
+
+def matrix(base,row,col):
+    """
+    Outputs a matrix *row*x*col* of random integers modulo *base*.
+    """
+
+    ibase = int(base)
+    irow = int(row)
+    icol = int(col)
+    out_seq_str = ""
+    if ibase < 2:
+        return "Error: Nonsense modulo, choose integer > 1."
+    if irow < 1 or icol < 1:
+        return "Error: Matrix is too small."
+
+    while irow > 0:
+        for i in range(icol):
+            out_seq_str += str(int(r.random() * 1000)  % ibase) + "\t"
+        if irow > 1:
+            out_seq_str += "\n"
+        irow -= 1
+
+    return out_seq_str
 
 
 if __name__ == '__main__':
