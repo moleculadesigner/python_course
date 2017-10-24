@@ -9,6 +9,7 @@ Danila Iakovlev
 """
 
 def main():
+    """
     print("1. Is 200 greater than 100 and less then 300? (By tho ways)")
     print("Logic: " + str(triple_comp_logic(100, 200, 300)))
     print("Chain: " + str(triple_comp_chain(100, 200, 300)))
@@ -36,6 +37,11 @@ def main():
         out += "odd."
     print(out)
     print("______\n")
+
+    print("4. (0 if -1 < 0 else 1) + 1 is " + str((0 if -1 < 0 else 1) + 1))
+    print("   (0 if  1 < 0 else 1) + 1 is " + str((0 if 1 < 0 else 1) + 1))
+    print("______\n")
+    """
 
 
 def triple_comp_chain(left, check, right):
