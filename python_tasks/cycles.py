@@ -25,6 +25,10 @@ def main():
     fibonacci(1,0,14)
     print("______\n")
 
+    print()
+    burst(1,2,15)
+    print()
+
 
 def int_seq(lim):
     """
@@ -123,6 +127,22 @@ def fibonacci(base_1, base_2, length):
             out_seq_str += ", "
 
     print(out_seq_str)
+
+
+def burst(base, step, length):
+    if length < 2:
+        print("Error: invalid length!")
+        return "Error: invalid length"
+    
+    out_seq_str = "Geometric burst: " + str(base) + ", "
+    while length > 1:
+        base *= step
+        out_seq_str += str(base)
+        if length > 2:
+            out_seq_str += ", "
+        length -= 1
+    print(out_seq_str)
+    
 
 
 if __name__ == '__main__':
