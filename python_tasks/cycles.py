@@ -18,7 +18,11 @@ def main():
     print("______\n")
 
     print("3. Backward sequence from 133 to 112")
-    backward_seq(103,112)
+    backward_seq(133,112)
+    print("______\n")
+    
+    print("4. Fibonacci's sequence, first 14 members.")
+    fibonacci(1,0,14)
     print("______\n")
 
 
@@ -92,6 +96,33 @@ def backward_seq(max_num,min_num):
         j -= 1
     print(out_seq_str)
 
+
+def fibonacci(base_1, base_2, length):
+    """
+    Returns Fibonacci's sequence up to length'th member.
+    """
+
+    if length < 3:
+        print("Error: sequence is too short (<3), it's useless!")
+        return "Error: too short sequence."
+    if base_1 != base_2:
+        l_num = min(base_1,base_2)
+        g_num = max(base_1,base_2)
+    else:
+        l_num = base_1
+        g_num = base_1
+
+    swap = 0
+    out_seq_str = "Fibonacci: " + str(l_num) + ", " + str(g_num) + ", "
+    for i in range(3, length + 1):
+        swap = g_num
+        g_num += l_num
+        l_num = swap
+        out_seq_str += str(g_num)
+        if i < length:
+            out_seq_str += ", "
+
+    print(out_seq_str)
 
 
 if __name__ == '__main__':
