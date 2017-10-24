@@ -25,9 +25,9 @@ def main():
     fibonacci(1,0,14)
     print("______\n")
 
-    print()
+    print("5, 6. Geometric progression")
     burst(1,2,15)
-    print()
+    print("______\n")
 
 
 def int_seq(lim):
@@ -130,17 +130,25 @@ def fibonacci(base_1, base_2, length):
 
 
 def burst(base, step, length):
+    """
+    Prints geometric progression and its sum
+    """
+
     if length < 2:
         print("Error: invalid length!")
         return "Error: invalid length"
     
+    burst_sum = base
     out_seq_str = "Geometric burst: " + str(base) + ", "
     while length > 1:
         base *= step
+        burst_sum += base
         out_seq_str += str(base)
         if length > 2:
             out_seq_str += ", "
         length -= 1
+
+    out_seq_str += ("\n            Sum: " + str(burst_sum))
     print(out_seq_str)
     
 
