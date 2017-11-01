@@ -16,9 +16,21 @@ import math
 import random
 
 def main():
-    print("Enter some integer:")
+
+    """
+    # 1. Prime numbers
+    print("1. Enter some integer:")
     user_int = get_int()
-    print(str(is_prime(user_int)))
+    print("Number " + str(user_int) + " is" + ("" if is_prime(user_int) else " not") + " prime.")
+    print("______\n")
+    print(str(int(True)) + " " + str(int(False)))
+    """
+    # 2. Primes in interval
+    print("2. Enter begin of prime range:")
+    u_begin = get_int()
+    print("   Enter end of prime range:")
+    u_end  = get_int()
+    print("Primes here are:\n" + list_to_str(prime_interval(u_begin, u_end)))
 
 
 def get_int():
@@ -41,11 +53,36 @@ def is_integer(s):
 
 
 def is_prime(number = 2):
-    for divisor in range(2,int(pow(number,0.5))):
+    if number < 0:
+        number *= -1
+    for divisor in range(2,int(pow(number,0.5) + 1)):
         if number % divisor == 0:
             return False
     return True
 
+
+def prime_interval(begin = 2, end = 100000):
+    prime_list = []
+    if (begin > end) or (begin < 2 and end < 2):
+        return prime_list
+    if begin < 2 and end >= 2:
+        begin = 2
+    for i in range(begin,end+1):
+        if is_prime(i):
+            prime_list.append(i)
+    return prime_list
+
+
+def list_to_str(ls, row_len = 20):
+    out_s = ""
+    for i in range(len(ls)):
+        out_s += str(ls[i])
+        if i < len(ls) - 1:
+            out_s += "\t"
+        if i % row_len == row_len - 1:
+            out_s += "\n"
+    return out_s
+    
 
 if __name__ == '__main__':
     main()
