@@ -17,7 +17,8 @@ import random
 
 def main():
     print("Enter some integer:")
-    number = get_int()
+    user_int = get_int()
+    print(str(is_prime(user_int)))
 
 
 def get_int():
@@ -28,7 +29,7 @@ def get_int():
     while not is_integer(user_data):
         print("This is not an integer, try again:")
         user_data = input()
-    return user_data
+    return int(user_data)
 
 
 def is_integer(s):
@@ -37,3 +38,14 @@ def is_integer(s):
         return True
     except ValueError:
         return False
+
+
+def is_prime(number = 2):
+    for divisor in range(2,int(pow(number,0.5))):
+        if number % divisor == 0:
+            return False
+    return True
+
+
+if __name__ == '__main__':
+    main()
