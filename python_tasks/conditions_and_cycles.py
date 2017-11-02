@@ -1,6 +1,5 @@
 #!/usr/bin/python
 import math
-import random
 
 # Constants
 _even = True
