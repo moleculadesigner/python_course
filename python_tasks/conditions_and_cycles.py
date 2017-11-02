@@ -237,8 +237,8 @@ def p_triples(r_min = 1, r_max = 100, primitive = False):
         for n in range(1, m):
             if primitive and (not is_coprime(m, n) or (m % 2 != 0 and n % 2 != 0)):
                 continue
-            a = m ** 2 - n ** 2 # side 1
-            b = 2 * m * n       # side 2
+            a = m ** 2 - n ** 2 # leg 1
+            b = 2 * m * n       # leg 2
             c = m ** 2 + n ** 2 # diagonal
             if b < r_min or a < r_min:
                 continue
