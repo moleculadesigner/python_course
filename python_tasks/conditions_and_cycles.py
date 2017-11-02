@@ -4,7 +4,6 @@ import math
 # Constants
 _even = True
 _odd = False
-_phi = (1 + pow(5, 1/2))/2
 
 
 def main():
@@ -27,7 +26,8 @@ def main():
     
     7. Найдите все тройки пифагора для заданного интервала
 
-        [*Выполнил Данила Яковлев*](https://github.com/moleculadesigner "Мой гитхаб")
+    ***
+    Выполнил [Данила Яковлев](https://github.com/moleculadesigner "Мой гитхаб")
     """
     # 1. Prime numbers
     print("1. Enter some integer:")
@@ -45,9 +45,9 @@ def main():
 
     # 3. Even and odd numbered primes
     position = _even
-    print("3. Primes with even position: \n" + list_to_str(prime_interval(),int(position),2))
+    print("3. Primes with even position: \n" + list_to_str(prime_interval(), int(position), 2))
     position = _odd
-    print("\n   Primes with odd position: \n"  + list_to_str(prime_interval(),int(position),2))
+    print("\n   Primes with odd position: \n"  + list_to_str(prime_interval(), int(position), 2))
     print("______\n")
 
     # 4. Quit command
@@ -64,7 +64,7 @@ def main():
     print("______\n")
 
     # 7. Pythagorean triples
-    print("7. Pythagorean triples:\n" + list_to_str(p_triples(),0,1,5))
+    print("7. Pythagorean triples:\n" + list_to_str(p_triples(), 0, 1, 5))
     print("______")
 
 
@@ -163,6 +163,7 @@ def binet_fibonacci(n = 100):
 
     [Details in Wikipedia](https://en.wikipedia.org/wiki/Fibonacci_number#Closed-form_expression)
     """
+    _phi = (1 + pow(5, 1/2))/2
     return int(round((pow(_phi,n) - (pow(-_phi,-n)))/(2*_phi - 1),0))
 
 
