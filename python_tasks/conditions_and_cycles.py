@@ -6,6 +6,7 @@
 3. Выведете все числа в заданном интервале, позиция которых четна/нечетна (режим работы должен определятся из некоторой переменной которая при значении True должны выводить числа стоящие на четной позиции и наоборот).
 4. Запустите вечный цикл при этом на каждом шаге цикла просите ввести некоторое значение пользователя (команда input(...)), если пользователь ввел букву q то ваша программа должна завершаться
 5. Найдите сумму всех четных элементов ряда Фибоначчи, которые не превышают четыре миллиона.
+** Вопрос:** как сделать опциональные параметры?
 6. Найдите сумму всех чисел меньше 1000, кратных 3 или 5.
 7. Найдите все тройки пифагора для заданного интервала
 
@@ -15,8 +16,11 @@
 import math
 import random
 
+# Constants
 _even = True
 _odd = False
+_phi = (1 + pow(5,1/2))/2
+
 
 def main():
 
@@ -42,13 +46,15 @@ def main():
     position = _odd
     print("\n   Primes with odd position: \n"  + list_to_str(prime_interval(),int(position),2))
     print("______\n")
-    """
 
     # 4. Quit command
     print("4. Enter anything (q to skip):")
     get_break('q')
+    """
 
-    # 5. 
+    # 5. Fibonacci again
+    print(fibonacci_even())
+    
 
 
 def get_int():
@@ -64,7 +70,9 @@ def get_int():
 
 def get_break(c):
     """
-    Iteratively gets integer from std_in
+    Iteratively gets string from *std_in*
+
+    Quits if string *c* entered.
     """
     user_data = input()
     while not user_data == c:
@@ -82,6 +90,9 @@ def is_integer(s):
 
 
 def is_prime(number = 2):
+    """
+    Makes factorization of *number* and returns boolean **True** if prime.
+    """
     if number < 0:
         number *= -1
     for divisor in range(2,int(pow(number,0.5) + 1)):
@@ -91,6 +102,9 @@ def is_prime(number = 2):
 
 
 def prime_interval(begin = 2, end = 1000):
+    """
+    
+    """
     prime_list = []
     if (begin > end) or (begin < 2 and end < 2):
         return prime_list
@@ -120,16 +134,56 @@ def list_to_str(ls, offset = 0, step = 1, row_len = 20):
     return out_s
 
 
-def bine_fibonacci(n):
-"""
-Implements Bine's formula for fibonacci numbers:
-F_n = round( phi^n - (-phi)^-n / (2*phi - 1) )
-"""
+def bine_fibonacci(n = 100):
+    """
+    Implements Bine's formula for fibonacci numbers:
+    F_n = round( phi^n - (-phi)^-n / (2*phi - 1) )
+    """
+    return int(round(
+(pow(_phi,n) - (pow(-_phi,-n)))/(2*_phi - 1),0))
 
-    return 0
+def fibonacci_sum(f_max = 4000000, n_max = 50, n_mode = False):
+    """
+    *f_max* - will sum fibonacci numbers not greater than this value if *n_mode* is **False**
 
-def fibonacci_sum(cap, n_max, n_mode):
-    return 0
+    *n_max* - will sum n_max first fibonacci number if *n_mode* is **True**
+    """
+    try:
+        n_mode = bool(n_mode)
+    except ValueError:
+        return [0,0]
+    f = 0
+    F = 0
+    n = 0
+
+    if n_mode:
+        for n in range(n_max + 1):
+            F += bine_fibonacci(n)
+        return [F, n_max]
+    else:
+        while f < f_max:
+            F += f
+            n += 1
+            f = bine_fibonacci(n)
+        return [F, n - 1]
+
+
+def fibonacci_even(f_max = 4000000):
+    """
+    *f_max* - will sum fibonacci numbers not greater than this value if *n_mode* is **False**
+
+    *n_max* - will sum n_max first fibonacci number if *n_mode* is **True**
+    """
+    f = 0
+    F = 0
+    n = 1
+
+    while f < f_max:
+        F += f
+        # print("test > " + str(f))
+        n += 2
+        f = bine_fibonacci(n)
+    return [F, n - 2]
 
 
 if __name__ == '__main__':
