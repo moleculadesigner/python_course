@@ -13,15 +13,22 @@ def main():
     ## Циклы + Условные операторы
 
     1. Напишите проверку число на простату (число является простым,     если оно делится нацело только на себя и единицу)
+
     2. Выведете все простые числа для заданного интервала
+    
     3. Выведете все числа в заданном интервале, позиция которых     четна/нечетна (режим работы должен определятся из некоторой     переменной которая при значении True должны выводить числа стоящие  на четной позиции и наоборот).
+    
     4. Запустите вечный цикл при этом на каждом шаге цикла просите  ввести некоторое значение пользователя (команда input(...)), если    пользователь ввел букву q то ваша программа должна завершаться
+    
     5. Найдите сумму всех четных элементов ряда Фибоначчи, которые не   превышают четыре миллиона.
-    ** Вопрос:** как сделать опциональные параметры?
+
+      ** Вопрос:** как сделать опциональные параметры?
+    
     6. Найдите сумму всех чисел меньше 1000, кратных 3 или 5.
+    
     7. Найдите все тройки пифагора для заданного интервала
 
-        Выполнил Д. Яковлев
+        [*Выполнил Данила Яковлев*](https://github.com/moleculadesigner "Мой гитхаб")
     """
     # 1. Prime numbers
     print("1. Enter some integer:")
@@ -64,7 +71,7 @@ def main():
 
 def get_int():
     """
-    Iteratively gets integer from *std_in*
+    Iteratively gets integer from `std_in`
     """
     user_data = input()
     while not is_integer(user_data):
@@ -75,9 +82,9 @@ def get_int():
 
 def get_break(c):
     """
-    Iteratively gets string from *std_in*
+    Iteratively gets string from `std_in`
 
-    Quits if string *c* entered.
+    Quits if string `c` entered.
     """
     user_data = input()
     while not user_data == c:
@@ -96,7 +103,7 @@ def is_integer(s):
 
 def is_prime(number = 2):
     """
-    Makes factorization of *number* and returns boolean **True** if prime.
+    Makes factorization of `number` and returns boolean **True** if prime.
     """
     if number < 0:
         number *= -1
@@ -117,7 +124,7 @@ def is_coprime(a, b):
 
 def prime_interval(begin = 2, end = 1000):
     """
-    Returns list of primes from *begin* position to *end* position.
+    Returns list of primes from `begin` position to `end` position.
     """
     prime_list = []
     if (begin > end) or (begin < 2 and end < 2):
@@ -133,10 +140,10 @@ def prime_interval(begin = 2, end = 1000):
 def list_to_str(ls, offset = 0, step = 1, row_len = 20):
     """
     Formats list into string, delimiting elements with '\\t'\n
-    *ls* - input list;
-    *offset* - from what index to print;
-    *step* - each index to be printed;
-    *row_len* - how often will be line break
+    `ls` - input list;
+    `offset` - from what index to print;
+    `step` - each index to be printed;
+    `row_len` - how often will be line break
     """
     out_s = ""
     for i in range(offset, len(ls)):
@@ -152,17 +159,19 @@ def list_to_str(ls, offset = 0, step = 1, row_len = 20):
 def binet_fibonacci(n = 100):
     """
     Implements Binet's formula for fibonacci numbers:
-    F_n = round( phi^n - (-phi)^-n / (2*phi - 1) )\n
-    [Formula on Wikipedia](https://en.wikipedia.org/wiki/Fibonacci_number#Closed-form_expression)
+
+    ![Formula in Wikipedia](https://wikimedia.org/api/rest_v1/media/math/render/svg/d5bcd8a3944bc1f31f87c9e363d3cdf45f3aedd3)
+
+    [Details in Wikipedia](https://en.wikipedia.org/wiki/Fibonacci_number#Closed-form_expression)
     """
     return int(round((pow(_phi,n) - (pow(-_phi,-n)))/(2*_phi - 1),0))
 
 
 def fibonacci_sum(f_max = 4000000, n_max = 50, n_mode = False):
     """
-    *f_max* - will sum fibonacci numbers not greater than this value if *n_mode* is **False**
+    `f_max` - will sum fibonacci numbers not greater than this value if `n_mode` is **False**
 
-    *n_max* - will sum n_max first fibonacci number if *n_mode* is **True**
+    `n_max` - will sum n_max first fibonacci number if `n_mode` is **True**
     """
     try:
         n_mode = bool(n_mode)
@@ -186,7 +195,7 @@ def fibonacci_sum(f_max = 4000000, n_max = 50, n_mode = False):
 
 def fibonacci_even(f_max = 4000000):
     """
-    Will sum fibonacci numbers with even **n** not greater than *f_max*.\n
+    Will sum fibonacci numbers with even **n** not greater than `f_max`.\n
     """
     f = 0
     F = 0
@@ -202,7 +211,7 @@ def fibonacci_even(f_max = 4000000):
 
 def sum_factored(lim = 1000, list_of_divisors = [3,5]):
     """
-    Return sum of numbers up to *lim* divisible by any number from *list_of_divisors*.
+    Return sum of numbers up to `lim` divisible by any number from `list_of_divisors`.
     """
     sum_f = 0
     for n in range(1, lim + 1):
@@ -218,7 +227,7 @@ def sum_factored(lim = 1000, list_of_divisors = [3,5]):
 
 def p_triples(r_min = 1, r_max = 100, primitive = False):
     """
-    Return a list of Pythagorean triples, where all number are between *r_min* and *r_max*
+    Return a list of Pythagorean triples, where all number are between `r_min` and `r_max`
 
     primitive: means that numbers in triples are coprime.
     """
