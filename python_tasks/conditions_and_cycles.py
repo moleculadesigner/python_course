@@ -173,10 +173,7 @@ def fibonacci_sum(f_max = 4000000, n_max = 50, n_mode = False):
 
     `n_max` - will sum n_max first fibonacci number if `n_mode` is **True**
     """
-    try:
-        n_mode = bool(n_mode)
-    except ValueError:
-        return [0,0]
+    
     f = 0
     F = 0
     n = 0

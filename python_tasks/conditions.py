@@ -32,7 +32,8 @@ def main():
     out = "3. Number " + str(int(user_num)) + " is "
     if is_even(int(user_num)):
         out += "even."
-    else:
+    else:6
+    
         out += "odd."
     print(out)
     print("______\n")
