@@ -79,6 +79,22 @@ def get_int():
     return int(user_data)
 
 
+def get_num():
+    """
+    Iteratively gets float from `std_in`
+    """
+    user_data = input()
+    while not is_num(user_data):
+        print("This is not an number, try again:")
+        user_data = input()
+    return float(user_data)
+
+
+def get_str():
+    user_input = input()
+    return user_input
+
+
 def get_break(c):
     """
     Iteratively gets string from `std_in`
@@ -95,6 +111,14 @@ def get_break(c):
 def is_integer(s):
     try:
         int(s)
+        return True
+    except ValueError:
+        return False
+
+
+def is_num(s):
+    try:
+        float(s)
         return True
     except ValueError:
         return False
@@ -120,7 +144,6 @@ def is_coprime(a, b):
         return True
     return False
 
-
 def prime_interval(begin = 2, end = 1000):
     """
     Returns list of primes from `begin` position to `end` position.
@@ -136,7 +159,7 @@ def prime_interval(begin = 2, end = 1000):
     return prime_list
 
 
-def list_to_str(ls, offset = 0, step = 1, row_len = 20):
+def list_to_str(ls, sep = '\t', offset = 0, step = 1, row_len = 20):
     """
     Formats list into string, delimiting elements with '\\t'\n
     `ls` - input list;
@@ -149,7 +172,7 @@ def list_to_str(ls, offset = 0, step = 1, row_len = 20):
         if (i - offset) % step == 0:
             out_s += str(ls[i])
             if i < len(ls) - 1:
-                out_s += "\t" # + " :" + str(i) + ": "
+                out_s += sep # + " :" + str(i) + ": "
             if ((i - offset) / step) % row_len == row_len - 1:
                 out_s += "\n"
     return out_s
