@@ -107,7 +107,6 @@ def xor_cipher_table():
     return t
 
 
-
 def xor_cipher(message = "I am the message.", key = "password"):
     """
     Returns xor'ed string `message` ^ `key`.
