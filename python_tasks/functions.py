@@ -121,13 +121,12 @@ def xor_cipher(message = "I am the message.", key = "password"):
         chunks = []
         n_chunks = 1 + L // l
         for i in range(n_chunks):
-            chunks.append(message[i*l:(i + 1) * l])
+            chunks.append(message[i * l : (i + 1) * l])
 
         for chunk in chunks:
             for c,k in zip(chunk, key[:len(chunk)]):
                 code += chr(ord(c) ^ ord(k))
-        return code
-        
+        return code   
     else:
         return message
 
