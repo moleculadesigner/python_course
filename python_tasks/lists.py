@@ -276,8 +276,6 @@ def gauss(matrix):
             s -= tr_matrix[i][j] * sol_v[j]
         sol_v[i] = s / c
 
-    for i in range(len(sol_v)):
-        print(str(round(sol_v[i], 3)))
     return sol_v
                 
 
