@@ -5,18 +5,19 @@
 4. Вот строка 'rewlkdfsklgjdflkjglkdsfjgkldfsjglkjeroitewuiotujdigjsdfklg;klsdfgkl;jsdfkl;gjldk;sfjgjlk;sdfjlk;gjsdfl;kgl;kdsfjgl;kjsdfl;kgjl;sdfkjg;lkjsdflbvjdfslkglkrewjhtiowerjutioerutopiytuilyhjdsfl;kghjl;sdkf;gjdffffffffflkgjlkdfjglkasjdfoitweigheripjgierglisjdfkjlghsdfkj;l;hgkljasdhfglk;hsdfkjlghlk;sdfhg;kljsdflkgjlk;sdfjgl;ksdfjl;kgjsdfl;kjglk;sdfjgkjsdfl;kgjs;dlkfjgoiw3eujtio34wuytiergoijherjhlgjsdflkjgkl;dfjgkl;sdfjkl;gjsdf;lkjg;lsjeriotuerl;kjdsfkl;jgh;lksdfjg;lksdfjg;lksdfkjg;lkjreopyulidsjfl;kghjs;ldkjg;lkkjr5l;h;kljyhkl;rirtiririiiiiiiiiiiiiierwtsj;kldfjg;lksdfjgl;ksdjfl;gj;lsdfjg;lk' - удалите из нее все повторяющиеся буквы и выведете строку уникальных букв
 5. Какая буквенная подпоследовательность одинаковых символов самая длинная
 6. Напишите функцию которая будет удалять заданную букву из строки и протестируйте ее на вышеприведенной строчке 
-6. Вот список чисел - 2,3,3,45,4,23,43,54,34,5,32,423,4,23542354,3422,243,4,3,3,254,5643,3233,3,3,4,43,2,423,3,3,45,5,43,2,1,4,34234,34,3,342,23,4543,534,32423,23,4,4,4,3,423,3245,23,3,34254,235,234,5,235,4,345,235,23,5523,5,234,52,67,756,76,57,345,23,31,7,8,56,346,345,756,4343,754,674,8,568,9,65,34,3,5474,5687,56,2,3 - вычислите сумму этой последовательности
-7. Найдите наибольший/наименьший элемент предыдущего списка
-8. Отсортируйте предыдущий список
-9. Напишите программу, которая спрашивает е пользователя как много чисел Фибоначчи нужно сгенерировать а затем генерирует их
-10. сгенерируйте матрицу как список списков (через циклы и генераторы)
-11. Напишите функцию транспонирования матрицы
-12. Напишите функцию сложения матриц
-13. Напишите функцию умножения матриц
-14. Напишите функцию решения системы линейных уравнений методом Гаусса. Коэффициента уравнения задаются матрицей вектор неизвестных - вектором соответственно. [метод Гаусса и как его запрогать можно найти здесь](https://ru.wikipedia.org/wiki/%D0%9C%D0%B5%D1%82%D0%BE%D0%B4_%D0%93%D0%B0%D1%83%D1%81%D1%81%D0%B0) (можно не делать если кажется слишком сложным)
+7. Вот список чисел - 2,3,3,45,4,23,43,54,34,5,32,423,4,23542354,3422,243,4,3,3,254,5643,3233,3,3,4,43,2,423,3,3,45,5,43,2,1,4,34234,34,3,342,23,4543,534,32423,23,4,4,4,3,423,3245,23,3,34254,235,234,5,235,4,345,235,23,5523,5,234,52,67,756,76,57,345,23,31,7,8,56,346,345,756,4343,754,674,8,568,9,65,34,3,5474,5687,56,2,3 - вычислите сумму этой последовательности
+8. Найдите наибольший/наименьший элемент предыдущего списка
+9. Отсортируйте предыдущий список
+10. Напишите программу, которая спрашивает е пользователя как много чисел Фибоначчи нужно сгенерировать а затем генерирует их
+11. сгенерируйте матрицу как список списков (через циклы и генераторы)
+12. Напишите функцию транспонирования матрицы
+13. Напишите функцию сложения матриц
+14. Напишите функцию умножения матриц
+15. Напишите функцию решения системы линейных уравнений методом Гаусса. Коэффициента уравнения задаются матрицей вектор неизвестных - вектором соответственно. [метод Гаусса и как его запрогать можно найти здесь](https://ru.wikipedia.org/wiki/%D0%9C%D0%B5%D1%82%D0%BE%D0%B4_%D0%93%D0%B0%D1%83%D1%81%D1%81%D0%B0) (можно не делать если кажется слишком сложным)
 """
 import math
 import string
+import copy as cp
 import random as r
 
 import conditions_and_cycles as cas
@@ -26,7 +27,7 @@ _example_list = [2,3,3,45,4,23,43,54,34,5,32,423,4,23542354,3422,243,4,3,3,254,5
 
 
 def main():
-    """
+
     print("1. List from 1 to 100:")
     one_to_hundred = [i for i in range(1,101)]
     print(cas.list_to_str(one_to_hundred, '\t', 0, 1, 10) + '\b')
@@ -42,7 +43,8 @@ def main():
     print(cas.list_to_str(evn_to_hundred, '\t', 0, 1, 10))
     print("______\n")
 
-    print("4. Unique symbols in string:")
+    print("Original string:\n\n" + cas.list_to_str(_example_string, "", 0, 1, 50))
+    print("\n4. Unique symbols in string:")
     u_sym = get_unique_symbols(_example_string)
     print(u_sym)
     print("______\n")
@@ -53,11 +55,14 @@ def main():
     print("______\n")
 
 
-    print("6. Char remover")
-    masked_string = mask(_example_string, 'r')#ewlkdfsgjoitu;bvhpya345')
-    print(masked_string)
+    print("6. Char remover:")
+    mask_s = "rewlkdfs"#gjoitu;bvhpya345"
+    masked_string = mask(_example_string, mask_s)
+    print("Mask string: " + mask_s + "\nResult:\n\n" + cas.list_to_str(masked_string, '', 0, 1, 50))
+    print("______\n")
 
-    print("7. Sum of elements in list:")
+
+    print("7. Sum of elements in the list:")
     lsum = 0
     for i in _example_list:
         lsum += i
@@ -83,15 +88,23 @@ def main():
     print("12. Transposed:\n" + matrix_str(matrix_transpose(m)) + '\n')
     print("13. Sum:\n" + matrix_str(k) + "\n    +    \n" + matrix_str(l) + "\n    =    \n" + matrix_str(matrix_sum(k, l)) + '\n')
     print("14. And product:")
-    print(matrix_str(k) + "\n    x    \n" + matrix_str(matrix_transpose(l)) + "\n    =    \n" + matrix_str(matrix_multi(k, matrix_transpose(l)), '\t'))
+    print(matrix_str(k) + "\n    x    \n" + 
+          matrix_str(matrix_transpose(l)) + "\n    =    \n" +
+          matrix_str(matrix_multi(k, matrix_transpose(l)), '\t'))
+    les = matrix_gen(5, 6, 99)
     """
-
-    les = matrix_gen(6, 5)
-    print(matrix_str(les, "\t") + '\n') 
+    les = [[8, 2, 9, 7, 5, 4],
+           [0, 6, 5, 3, 1, 5],
+           [1, 8, 6, 5, 2, 9],
+           [1, 3, 0, 8, 8, 1],
+           [2, 4, 7, 6, 2, 2]]
+    """
+    print("\n15. System of linear equations:\n" + matrix_str(les, "\t") + '\n') 
 
     sel = gauss(les)
-    print(matrix_str(les, "\t") + '\n') 
-    print(cas.list_to_str(list(map(lambda x: round(x, 3), sel)), '\n'))
+    #print(matrix_str(les, "\t") + '\n') 
+    print("Result vector:\n" + cas.list_to_str(list(map(lambda x: '{:=+08.3f}'.format(x), sel)), '\n'))
+    
 
 
 
@@ -141,7 +154,7 @@ def mask(string, charset):
                 result += char
     else:
         result = mask(mask(string, charset[0]), charset[1:])
-    print('. ' + result + '\n')
+    #print('. ' + result + '\n')
     return result
 
 
@@ -192,14 +205,17 @@ def matrix_transpose(matrix):
 def matrix_sum(matrix1, matrix2):
     if len(matrix1) != len(matrix2) or len(matrix1[0]) != len(matrix2[0]):
         raise ValueError
-        
-    for i in range(len(matrix1)):
-        for j in range(len(matrix1)):
-            matrix1[i][j] += matrix2[i][j]
-    return matrix1
+    m1 = cp.deepcopy(matrix1)
+    m2 = cp.deepcopy(matrix2)
+    for i in range(len(m1)):
+        for j in range(len(m1)):
+            m1[i][j] += m2[i][j]
+    return m1
 
 
-def matrix_multi(matrix1, matrix2):
+def matrix_multi(
+                 matrix1,
+                 matrix2):
     if len(matrix1[0]) != len(matrix2):
         raise ValueError
         
@@ -241,8 +257,8 @@ def gauss(matrix):
     #print("Gauss:> solving:\n" + matrix_str(matrix) + '\n')
     n_vars = len(matrix[0]) - 1
     n_rows = len(matrix)
-    tr_matrix = matrix_sort(matrix.copy())
-    #print("Gauss:> sorted:\n" + matrix_str(tr_matrix) + '\n')
+    tr_matrix = matrix_sort(cp.deepcopy(matrix))
+    #print("Gauss:> original:\n" + matrix_str(matrix) + '\n')
  
     for i in range(n_rows - 1):
         zeroes = 0
@@ -260,13 +276,19 @@ def gauss(matrix):
             for j in range(zeroes, n_vars + 1):
                 tr_matrix[ii][j] -= tr_matrix[i][j] * c
     
+    #print("Gauss:> triangle:\n" + matrix_str(tr_matrix, '\t') + '\n')
+    #print("Gauss:> original:\n" + matrix_str(matrix) + '\n')
+
+
     if n_vars > n_rows:
         pass
     elif n_vars < n_rows:
         tr_matrix = tr_matrix[:n_vars]
         n_rows = n_vars
     sol_v = [0 for i in range(n_vars)]
-    sol_v[n_vars - 1] = tr_matrix[n_rows - 1][n_vars] / tr_matrix[n_rows - 1][n_vars - 1]
+    
+    if tr_matrix[n_rows - 1][n_vars - 1] != 0:
+        sol_v[n_vars - 1] = tr_matrix[n_rows - 1][n_vars] / tr_matrix[n_rows - 1][n_vars - 1]
     for i in range(n_vars - 2, -1, -1):
         c = tr_matrix[i][i]
         if c == 0:
@@ -293,7 +315,7 @@ def matrix_sort(matrix):
 
     0 1 2 0
     """
-    s_matrix = matrix
+    s_matrix = cp.deepcopy(matrix)
     swapped = True
     #print("raw:\n" + matrix_str(s_matrix))
     while swapped:
@@ -322,8 +344,7 @@ def matrix_sort(matrix):
                 swapped = True
                 #print("\nswap:\n" + matrix_str(s_matrix))
                 continue
-    else:
-        return s_matrix
+    return s_matrix
             
 
 
