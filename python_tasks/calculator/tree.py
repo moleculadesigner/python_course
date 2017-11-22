@@ -62,6 +62,8 @@ def deeps(tree, lvl = ''):
 def assign(tree, leafs = [i for i in range(100)]):
     for i in range(len(tree) -1, -1, -1):
         if not is_list(tree[i]):
+            if not len(leafs):
+                return
             if not tree[i]:
                 tree[i] = leafs.pop()
 
@@ -88,6 +90,6 @@ def draw_tree(tree, lvl = 0):
 
 assign(t1)
 assign(t2)
-means = [0, 0, 0, 1, 2, 3, 4, 5, 6, 7, t2, t1]
+means = [t2, t1]
 assign(tree, means)
 print(draw_tree(tree))
