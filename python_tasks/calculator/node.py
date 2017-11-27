@@ -7,20 +7,23 @@ from inspect import signature
 #        return func(arg, *args)
 #    return curry
 
+leaf = 'leaf'
+link = '○ <<'
+
 class Node():
     """
     A node/subtree in abstract synax tree.
-
-    Fields:
+    
+    **Fields**:
     * `name` An operator name or 'leaf' if there are no child nodes.
     * `expression` the leaf value or lambda expression if not a leaf.
     * `children` a list of child nodes.
 
-    Methods:
+    **Methods**:
     * `grow(node)` Add a `node` into the left unsetttled child node.
     * `render()` Returns a value of tree (process all subtrees).
     * `strip()` Returns the rightest settled child node and clear it.
-    * `check()` Matches number of operands and number of children and returns **True** if correct.
+    * `check()` Iteratively matches number of operands and number of children and returns **True** if correct.
     * `show()` Returns string containing a schematic view of the node subtree.
     """
     name = str()
@@ -28,7 +31,7 @@ class Node():
     children = []
     parent = None
 
-    def __init__(self, name = 'leaf', expression = 0, child_num = 0, parent = None):
+    def __init__(self, name = leaf, expression = 0, child_num = 0, parent = None):
         """
         Creates a new leaf or node with unsettled children.
         """
@@ -41,7 +44,7 @@ class Node():
         
     def render(self):
         """Returns a value of tree (process all subtrees)."""
-        if self.name == 'leaf':
+        if self.name == leaf:
             return self.expression
         result = self.expression
         
@@ -49,7 +52,7 @@ class Node():
             if node != None:
                 result = partial(result, node.render())
             else:
-                print("Render error: empty argument in function {}{}.".format(self.name, str(signature(result))))
+                print("Render error: lack of arguments in function {}{}.".format(self.name, str(signature(result))))
                 raise ValueError
             
         #try:
@@ -61,7 +64,8 @@ class Node():
         return result()
 
     def grow(self, node):
-        if self.name == 'leaf' or not len(self.children):
+        """Add a `node` into the left unsetttled child node."""
+        if self.name == leaf or self.name == link:
             return False
         for i in range(len(self.children)):
             if self.children[i] == None:
@@ -73,12 +77,16 @@ class Node():
                 self.children[i].grow(node)
 
     def show(self, level = 0):
-        """Returns string containing a schematic view of the node subtree."""
+        """Returns string containing a schematic view of the tree."""
         s = ''
-        if self.name == 'leaf':
+        if self.name == leaf:
             for i in range(level):
                 s += '┊\t'
             return s + str(self.expression) + '\n'
+        #elif self.name == '○ <<':
+        #    for i in range(level):
+        #        s += '┊\t'
+        #    return s + '○ << ' + self.children[0].name + '\n'
         for i in range(level):
             s += '┊\t'
         s += '╭ ' + self.name + '\n'
@@ -90,13 +98,18 @@ class Node():
                 for i in range(level):
                     s += '┊\t'
                 s += '○\n' #∘○◌
-        return s
+        return s  
 
-        
-    
+def wrap(number):
+    """Just an alias to `Node('leaf', number)` method, creating a leaf node."""
+    return Node(leaf, number)
 
-"""
-"""
+def fakenode(node):
+    """Creates a new node with a link to `node`. Use carefully: high risk of endless recursion."""
+    fl = Node(link, lambda x: x, 1)
+    fl.children[0] = node
+    return fl
+
 def demo():
     print("Abstract syntax tree class demo:")
     print("1. Creating a '+' operator node n:\n>>> n = Node('+', lambda a, b: b + a, 2)")
@@ -108,10 +121,10 @@ def demo():
     k.name = '•'
     l.name = 'sum'
     k.expression = lambda a, b: b * a
-    print("\n4. Also we need some arguments (leaf nodes):\n>>> m = Node('leaf', 1) (m = 1)\n>>> o = Node('leaf', 5) (o = 5)\n>>> q = Node('leaf', 3) (q = 3)")
-    m = Node('leaf', 1)
-    o = Node('leaf', 5)
-    q = Node('leaf', 3)
+    print("\n4. Also we need some arguments (leaf nodes):\n>>> m = Node('leaf', 3) (m = 3)\n>>> o = Node('leaf', 5) (o = 5)\n>>> q = wrap(3) (q = 3): shorter way")
+    m = Node(leaf, 3)
+    o = wrap(5)
+    q = wrap(3)
     print("\n5. Sometimes we need to draw a tree:\n>>> print(k.show())")
     print(k.show())
     print("\n6. Setting up a tree:\n>>> n.grow(m)")
@@ -124,18 +137,19 @@ def demo():
     k.grow(n)
     k.grow(l)
     print(k.show())
+
     
     print("7. This tree represents a function of 2 arguments, so trying to render it will raise a ValueError:\n>>> k.render()")
     try:
         k.render()
     except ValueError:
         print('We cannot render functions yet, only complete expressions.\n')
-    print("8. Finalizing and render tree:\n>>> k.grow(q)")
+    print("8. Finalizing and render tree:\n>>> l.grow(fakenode(n)) — link to node n")
     print("And adding an absolutely new leaf:\n>>> k.grow(Node('leaf', 1.25))")
-    k.grow(q)
+    l.grow(fakenode(n))
     k.grow(Node('leaf', 1.25))
     print(k.show())
-    print("3 1.25 + 1 5 + * = {}".format(k.render()))
+    print("The tree could be easily converted into postfix notation:\n3 5 + 1.25 + 3 5 + * = {}".format(k.render()))
 
 if __name__ == '__main__':
     demo()
