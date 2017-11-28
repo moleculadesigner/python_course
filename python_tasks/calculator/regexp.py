@@ -126,9 +126,14 @@ def makeAST(tokens):
     
     print(str(queue))
 
-expr = "sum(1,2,3) * 0.03 + 45 - e^(12*4/56.01)"
-print(expr)
-ast = makeAST(parse(expr))
-print(ast.show())
-print(ast.render())
+    
+def demo():
+    expr = "sum(1,2,3) * 0.03 + 45 - e^(12*4/56.01)"
+    print(expr)
+    ast = makeAST(parse(expr))
+    print(ast.show())
+    print(ast.render())
+
+if __name__ == '__main__':
+    demo()
 
