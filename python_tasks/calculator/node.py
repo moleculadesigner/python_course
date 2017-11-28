@@ -100,6 +100,20 @@ class Node():
                 s += '○\n' #∘○◌
         return s  
 
+    def freenodes(self):
+        """
+        Returns total number of **None** children in the tree.
+        """
+        free = 0
+        if self.name in [leaf, link]:
+            return free
+        for node in self.children:
+            if node:
+                free += node.freenodes()
+            else:
+                free += 1
+        return free
+
 def wrap(number):
     """Just an alias to `Node('leaf', number)` method, creating a leaf node."""
     return Node(leaf, number)
@@ -153,4 +167,3 @@ def demo():
 
 if __name__ == '__main__':
     demo()
-
