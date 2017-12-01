@@ -2,6 +2,7 @@ import re
 import math
 from node import *
 
+
 operators = {
     '+'     : (3, 'L', [lambda a, b: a +  b, 2]),
     '-'     : (3, 'L', [lambda a, b: a -  b, 2]),
@@ -11,25 +12,35 @@ operators = {
     }
 
 functions = {
-    'id'    : Node('id', lambda x: x, 1, None, 'id(a)')
-}
+    'id'    : (Node('id', lambda x: x, 1, None, 'id(a)'))}
 
 variables = {
     'pi'    : 3.1415926,
-    'e'     : 2.7182818
-}
+    'e'     : 2.7182818}
 
 float_re = re.compile(r"^\d+?\.\d+?$")
 varname_re = re.compile(r"^[a-z_]+?$")
 parse_re = re.compile(r'[a-z_]+|[-+*\/\^(),]|\d+\.?\d*')
 
+# Literals
+# borders: │┊╭─╮╰╯
 greeting = (
-    "*****************************************************\n"+
-    "* Arithmetical expressions evaluator                *\n"+
-    "* Author: Dan Iakovlev (moleculadesigner@gmail.com) *\n"+
-    "* 2017                                              *\n"+
-    "*****************************************************\n")
+    "╭---------------------------------------------------╮\n"+
+    "┊ Arithmetical expressions evaluator                ┊\n"+
+    "┊ Type help for further instructions                ┊\n"+
+    "┊ Author: Dan Iakovlev (moleculadesigner@gmail.com) ┊\n"+
+    "┊ 2017                                              ┊\n"+
+    "╰---------------------------------------------------╯\n")
 
+stop = [
+    'exit',
+    'quit',
+    'close']
+
+
+def show_help():
+    with open('help') as hfile:
+        print(hfile.read())
 
 
 def parse(expr):
@@ -74,15 +85,14 @@ def make_AST(tokens, params = []):
         else:
             n = Node(p, lambda x: x, 1)
             n.grow(wrap('♦'))
-            parameters[p] = [
+            parameters[p.split('.')[0]] = [
                 n, # a parameter node with function Id (\x. x) and a dummy leaf. 
                 0 # How many times the parameter was used
             ]
             
 
     for token in tokens:
-        #print("Token: {}".format(token))
-        # Digits go directly to queue
+        # Numcers go directly to the queue
         if token.isdigit():
             queue.append(wrap(int(token)))
         elif float_re.match(token):
@@ -131,7 +141,7 @@ def make_AST(tokens, params = []):
                 raise SyntaxError
             elif stack[-1].name == '(':
                 stack.pop()
-                if stack and stack[-1].name in functions.keys():
+                if stack and stack[-1].fname.split("(")[0] in functions.keys():
                     apply(stack.pop(), queue)
             else:
                 print("Shunting yard: unknown syntax error. Recheck the expression:\n> {}".format(' '.join(tokens)))
@@ -140,6 +150,9 @@ def make_AST(tokens, params = []):
         else:
             print("Unknown operation or invalid number.")
             raise SyntaxError
+        
+        #print("Stack: {}\nQueue: {}\n".format(' '.join([s.name for s in stack]), ' '.join([q.name for q in queue])))
+        
         # End of tokens
 
     # Utilizing op stack
@@ -149,13 +162,14 @@ def make_AST(tokens, params = []):
             raise SyntaxError
         else:
             apply(stack.pop(), queue)
+        #print("Stack: {}\nQueue: {}\n".format(' '.join([s.name for s in stack]), ' '.join([q.name for q in queue])))
 
+    # Removing dummy leafs from parameters
     if params:
         for p in parameters.keys():
             parameters[p][0].strip()
 
     if len(queue) == 1:
-        #print(queue[0].show())
         return queue[0]          
     else:
         print("Failed to render syntax tree: invalid number of arguments")
@@ -174,66 +188,71 @@ def add_variable(varname: str, tokens: list):
         variables[varname] = make_AST(tokens).render()
 
 
-def add_function(funcname, tokens, params):
-    ast = make_AST(tokens, params)
-    ast.fname = "{}({})".format(funcname, ", ".join(params))
+def add_function(tokens):
+    funcname = tokens[0]
+    if not varname_re.match(funcname):
+        print("Invalid function name: {}".format(funcname))
+        raise SyntaxError
+    params = []
+    if tokens[1] == '(':
+        for c in range(2, len(tokens)):
+            if tokens[c] == ')':
+                close = c + 1
+                break
+            elif tokens[c] == ',':
+                continue
+            else:
+                params.append('{}.{}'.format(tokens[c], funcname))
+    else:
+        print("Invalid function definition: {}".format(' '.join(tokens)))
+    ast = make_AST(tokens[close:], params)
+    ast.fname = "{}({}) = {}".format(funcname, ', '.join(map(lambda x: x.split('.')[0], params)), "".join(tokens[close:]))
     functions[funcname] = ast
 
 
-def show_help():
-    print("Help")
+
 
 def calculator():
+    print(greeting)
     while True:
-        print(greeting)
         raw = input("math > ")
         commands = parse(raw)
         if not commands:
             continue
-        elif commands[0] == 'exit':
+        elif commands[0] in stop:
             return
 
-        elif commands[0] == 'let':
+        elif commands[0] == 'let': # Assign a new variable
             try:
                 add_variable(commands[1], commands[2:])
             except Exception:
                 continue 
             print("Remembered {} = {}".format(commands[1], variables[commands[1]]))
 
-        elif commands[0] == 'function':
-            funcname = commands[1]
-            params = []
-            if commands[2] == '(':
-                for c in range(3, len(commands)):
-                    if commands[c] == ')':
-                        close = c + 1
-                        break
-                    elif commands[c] == ',':
-                        continue
-                    else:
-                        params.append(commands[c])
+        elif commands[0] == 'function': # Assign a new function
+            try:
+                add_function(commands[1:])
+            except Exception:
+                continue
+            print("Function {} is saved.".format(functions[commands[1]].fname))
+
+        elif commands[0] == 'tree': # Draw syntax tree for following expression
+            if commands[1:]:
+                try:
+                    ast = make_AST(commands[1:])
+                except Exception:
+                    continue
+                print(ast.show())
             else:
-                print("Invalid function definition.")
-            try:
-                add_function(funcname, commands[close:], params)
-            except Exception:
-                continue
-            print("Function {}({}) = {} is saved.".format(funcname, ", ".join(params), "".join(commands[close:])))
+                print("Nothing to draw")
 
-        elif commands[0] == 'tree':
-            try:
-               ast = make_AST(commands[1:])
-            except Exception:
-                continue
-            print(ast.show())
-
-        elif commands[0] == 'help':
+        elif commands[0] == 'help': # Show help
             show_help()
                
-        elif commands[0] == 'reveal':
+        elif commands[0] == 'reveal': # Show list of functions and variables
             print("Functions:")
-            for f in functions.items():
-                print("{}\t{}".format(f[0], f[1].fname))
+            for f in functions.values():
+                print(f.fname)
             print("\nVariables:")
             for v in variables.items():
                 print("{}\t{}".format(v[0], v[1]))
@@ -250,7 +269,7 @@ def calculator():
 
 def demo():
     add_variable('g', ['9.8'])
-    add_function('del', parse('(a + c)/b'), ['a', 'b', 'c'])
+    add_function(parse('del(a, b, c) a*c + b'))
     print(functions['del'].show())
     expr = "del(2,3, 5) * 0.03 + 45 - e^(12*4/56.01)"
     print(expr)

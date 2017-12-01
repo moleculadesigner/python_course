@@ -8,7 +8,7 @@ from inspect import signature
 #    return curry
 
 leaf = 'leaf'
-link = '○ <<'
+link = '○ <╮'
 
 class Node():
     """
@@ -91,7 +91,7 @@ class Node():
         #    return s + '○ << ' + self.children[0].name + '\n'
         for i in range(level):
             s += '┊\t'
-        s += '╭ {} {}\n'.format(self.name, self.fname)
+        s += '╭ {} {}\n'.format(self.name, self.fname.split('(')[0])
         level += 1
         for child in self.children:
             if child:
