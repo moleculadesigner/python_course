@@ -2,6 +2,7 @@ import gzip
 import requests
 import io
 from contextlib import closing
+import hashlib
 
 def get_archive(url):
     """
@@ -13,6 +14,20 @@ def get_archive(url):
     with closing(raw), gzip.GzipFile(fileobj=io.BytesIO(raw.content)) as archive:
         return bytes(archive.read()).decode()
     return 'Requests error'
+
+
+def wrap(sequence:str, header = None, linewidth = 72):
+    if sequence:
+        if header is None:
+            hd = hashlib.md5(sequence.encode()).hexdigest()
+            out = '>{}\n'.format(hd)
+        else:
+            out = '>{}\n'.format(header)
+        for i in range(len(sequence) // linewidth):
+            out += sequence[i * linewidth : (i + 1)*linewidth] + '\n'
+        out += sequence[(linewidth * (len(sequence) // linewidth)):]
+        return(out)
+    return ''
 
 
 def show_dict(dict:dict):
