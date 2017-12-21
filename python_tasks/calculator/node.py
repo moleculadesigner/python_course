@@ -26,23 +26,17 @@ class Node():
     * `freenodes()` Returns total number of empty nodes (**None**) in the tree. 
     * `show()` Returns string containing a schematic view of the node subtree.
     """
-    name = str()
-    fname = ''
-    expression = 0
-    children = []
-    parent = None
-
     def __init__(self, name = leaf, expression = 0, child_num = 0, parent = None, fname = ''):
         """
         Creates a new leaf or node with unsettled children.
         """
         self.name = name
+        self.fname = fname
         self.expression = expression
         self.children = []
         for i in range(child_num):
             self.children.append(None)
         self.parent = parent
-        self.fname = fname
         
     def render(self):
         """Returns a value of tree (process all subtrees)."""

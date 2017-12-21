@@ -210,8 +210,6 @@ def add_function(tokens):
     functions[funcname] = ast
 
 
-
-
 def calculator():
     print(greeting)
     while True:
