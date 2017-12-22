@@ -40,6 +40,13 @@ def show_dict(dict:dict):
     return content
 
 
+def hamming_distance(s1, s2):
+    """Return the Hamming distance between equal-length sequences"""
+    if len(s1) != len(s2):
+        raise ValueError("Undefined for sequences of unequal length")
+    return sum(c1 != c2 for c1, c2 in zip(s1, s2))
+
+
 def test():
     ar = get_archive('http://hgdownload.soe.ucsc.edu/goldenPath/hg38/chromosomes/chrY.fa.gz')
     print("Fist 1000 chars in\nhttp://hgdownload.soe.ucsc.edu/goldenPath/hg38/chromosomes/chrY.fa.gz\n{}".format(ar[:1000]))
