@@ -26,7 +26,7 @@ class Node():
     * `freenodes()` Returns total number of empty nodes (**None**) in the tree. 
     * `show()` Returns string containing a schematic view of the node subtree.
     """
-    def __init__(self, name = leaf, expression = 0, child_num = 0, parent = None, fname = ''):
+    def __init__(self, name=leaf, expression=0, child_num=0, parent=None, fname=''):
         """
         Creates a new leaf or node with unsettled children.
         """
@@ -60,7 +60,7 @@ class Node():
         return result()
 
     def grow(self, node):
-        """Add a `node` into the left unsetttled child node."""
+        """Add a `node` into the left unsettled child node."""
         if self.name in [leaf, link]:
             return False
         for i in range(len(self.children)):
@@ -72,7 +72,7 @@ class Node():
             else:
                 self.children[i].grow(node)
 
-    def show(self, level = 0):
+    def show(self, level=0):
         """Returns string containing a schematic view of the tree."""
         s = ''
         if self.name == leaf:
@@ -94,7 +94,10 @@ class Node():
                 for i in range(level):
                     s += '┊\t'
                 s += '○\n' #∘○◌
-        return s  
+        return s
+
+    def __repr__(self):
+        return "Node object:\n{}".format(self.show())
 
     def freenodes(self):
         """
