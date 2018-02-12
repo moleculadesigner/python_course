@@ -1,4 +1,4 @@
-    
+help = """    
     Arithmetical expressions evaluator help
     
     Just print arithmetical expression to evaluate it.
@@ -14,9 +14,10 @@
     > function avrg(a, b) a/b + b/a
     > function field(a, b) avrg(a, b) * e^k_factor
 
-N.B.
+\x1b[31mN.B.
     Variable and function names must consist only
     of a-z and _ characters.
+\x1b[0m
 
     To view functions and variables print reveal and you will get
     something like this:
@@ -42,5 +43,9 @@ N.B.
     close
 
     Author: Dan Iakovlev
-            moleculadesigner@gmail.com
+            \x1b[34mmoleculadesigner@gmail.com\x1b[0m
     License: WTFPL
+"""
+
+if __name__ == '__main__':
+    print(help)

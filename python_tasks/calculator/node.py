@@ -72,13 +72,13 @@ class Node():
             else:
                 self.children[i].grow(node)
 
-    def show(self, level=0):
+    def show(self, level=0, expr=False):
         """Returns string containing a schematic view of the tree."""
         s = ''
         if self.name == leaf:
             for i in range(level):
-                s += '┊\t'
-            return s + str(self.expression) + ' {}\n'.format(self.fname)
+                s = '{}┊\t'.format(s)
+            return '{}{}{}\n'.format(s, self.expression, self.fname)
         #elif self.name == '○ <<':
         #    for i in range(level):
         #        s += '┊\t'
