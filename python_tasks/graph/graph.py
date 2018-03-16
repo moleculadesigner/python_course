@@ -50,6 +50,11 @@ class Graph:
             if e not in self.edges:
                 self.edges.append(e)
 
+    def add(self, node):
+        self.nodes.add(node)
+        for nb in node.neighbors:
+            self.bind(node, nb)
+
     def __repr__(self):
         V = ", ".join(map(str, self.nodes))
         E = ", ".join(map(lambda e: "({}, {})".format(*e), self.edges))
@@ -60,19 +65,20 @@ class Graph:
     @property
     def matrix(self):
         dim = len(self.nodes)
-        m = np.zeros((dim, dim))
+        m = np.zeros((dim, dim), dtype=np.int64)
         nds = list(self.nodes)
         for i, node in enumerate(nds):
             for j, nb in enumerate(nds[i:]):
                 if frozenset((node, nb)) in self.edges:
                     m[i, i + j] = 1
         return m + m.T
-            
 
-a = Node()
-b = Node([a])
-c = Node([a])
-d = Node([a, b, c])
-G = Graph([a, b, c, d], [(d, c)])
-print(G)
-print(G.matrix)
+
+if __name__ == '__main__':
+    a = Node()
+    b = Node([a])
+    c = Node([a])
+    d = Node([a, b, c])
+    G = Graph([a, b, c, d], [(d, c)])
+    print(G)
+    print(G.matrix)
