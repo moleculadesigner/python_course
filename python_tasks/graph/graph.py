@@ -4,57 +4,75 @@ class Node:
     """
     A simple implementation of graph theory objects
     """
-    def __init__(self, neighbors=None, name='node', content=None):
-        if neighbors:
-            self.neighbors = set(neighbors)
+    def __init__(self, neighbors=[], name=None, content=None):
+        self.neighbors = set(neighbors)
+        if content:
+            self.content = content
+        if name:
+            self.name = name
         else:
-            self.neighbors = set()
-        self.content = content
-        self.name = name
-        self.edges = set()
-        for n in self.neighbors:
-            n.neighbors.add(self)
-            self.edges.add((self, n))
-            n.edges.add((n, self))
+            self.name = (id(self) % 100000)
 
     def __repr__(self):
         return "n.{}".format(self.name)
 
     def bind(self, node):
         self.neighbors.add(node)
-        self.edges.add((self, node))
         node.neighbors.add(self)
-        node.edges.add((node, self))
 
     @property
     def deg(self):
-        return len(list(self.edges))
+        return len(list(self.neighbors))
 
 
 class Graph:
     """
     """
 
-    def __init__(self, nodes=None, edges=None):
-        if nodes:
-            self.nodes = set(nodes)
-        else:
-            self.nodes = set()
+    def __init__(self, nodes=[], edges=[]):
+        self.nodes = set(nodes)
         
-        self.edges = set()
+        self.edges = list()
         for node in self.nodes:
-            self.edges |= node.edges
+            for nb in node.neighbors:
+                self.bind(node, nb) 
+        for e in map(tuple, edges):
+            if len(e) != 2:
+                raise ValueError("Incorrect format of edge")
+            if e[0] == e[1]:
+                raise ValueError("Loops are not implemented yet, sorry.")
+            self.bind(*e)
 
-        if edges:
-            new_e = set(edges) - self.edges
-            for n1, n2 in new_e:
-                n1.bind(n2)
+    def bind(self, n1, n2):
+        if n1 in self.nodes and n2 in self.nodes:
+            n1.bind(n2)
+            e = frozenset((n1, n2))
+            if e not in self.edges:
+                self.edges.append(e)
 
     def __repr__(self):
-        return "{}{}{}".format('{', ", ".join(map(str, self.nodes)), '}')
+        V = ", ".join(map(str, self.nodes))
+        E = ", ".join(map(lambda e: "({}, {})".format(*e), self.edges))
+        return str("""<V, E>: <{{{}}},
+         {{{}}}
+        >""".format(V, E))
+
+    @property
+    def matrix(self):
+        dim = len(self.nodes)
+        m = np.zeros((dim, dim))
+        nds = list(self.nodes)
+        for i, node in enumerate(nds):
+            for j, nb in enumerate(nds[i:]):
+                if frozenset((node, nb)) in self.edges:
+                    m[i, i + j] = 1
+        return m + m.T
             
 
-a = Node(name='A')
-b = Node([a], 'B')
-c = Node([a], 'C')
-print(Graph([a, b, c]))
+a = Node()
+b = Node([a])
+c = Node([a])
+d = Node([a, b, c])
+G = Graph([a, b, c, d], [(d, c)])
+print(G)
+print(G.matrix)

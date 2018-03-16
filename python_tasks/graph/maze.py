@@ -18,19 +18,23 @@ def convert(smap:str):
                     mz[i, j] = 1
                     s = (i, j)
                 else:
-                    raise ValueError("Too much start points.")
+                    raise ValueError("Too many start points.")
             elif tile == 'T':
                 if e is None:
                     mz[i, j] = 1
                     e = (i, j)
                 else:
-                    raise ValueError("Too much end points.")
+                    raise ValueError("Too many end points.")
     if s is None or e is None:
         raise ValueError("There is no start/end point.")
 
     return mz, s, e
 
-with open("find_path.ai", 'r') as path:
-    smap = path.read().strip()
+def demo():
+    with open("find_path.ai", 'r') as path:
+        smap = path.read().strip()
+        print(convert(smap))
 
-print(convert(smap))
+
+if __name__ == '__main__':
+    demo()
