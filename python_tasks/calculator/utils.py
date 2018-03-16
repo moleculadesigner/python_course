@@ -1,7 +1,8 @@
 import re
 import math
-from node import *
 
+from node import *
+from help import help
 
 operators = {
     '+'     : (3, 'L', [lambda a, b: a +  b, 2]),
@@ -23,14 +24,15 @@ varname_re = re.compile(r"^[a-z_]+?$")
 parse_re = re.compile(r'[a-z_]+|[-+*\/\^(),]|\d+\.?\d*')
 
 # Literals
-# borders: │┊╭─╮╰╯
-greeting = (
-    "╭---------------------------------------------------╮\n"+
-    "┊ Arithmetical expressions evaluator                ┊\n"+
-    "┊ Type help for further instructions                ┊\n"+
-    "┊ Author: Dan Iakovlev (moleculadesigner@gmail.com) ┊\n"+
-    "┊ 2017                                              ┊\n"+
-    "╰---------------------------------------------------╯\n")
+# borders: │┊╭─╮╰─╯
+greeting = ("""
+    ╭---------------------------------------------------╮
+    ┊ Arithmetical expressions evaluator                ┊
+    ┊ Type help for further instructions                ┊
+    ┊ Author: Dan Iakovlev (\x1b[4mmoleculadesigner@gmail.com\x1b[0m) ┊
+    ┊ 2017                                              ┊
+    ╰---------------------------------------------------╯
+    """)
 
 stop = [
     'exit',
@@ -39,9 +41,21 @@ stop = [
 
 
 def show_help():
-    with open('help') as hfile:
-        print(hfile.read())
+    print(help)
 
+
+def colorize(message:str, color='black'):
+    """Place some ESC symbols around the `message`"""
+    colors = {
+        'black': ('\x1b[30m', '\x1b[0m'),
+        'red': ('\x1b[31m', '\x1b[0m'),
+        'green': ('\x1b[32m', '\x1b[0m'),
+        'yellow': ('\x1b[33m', '\x1b[0m'),
+        'blue': ('\x1b[34m', '\x1b[0m')
+    }
+    if color in colors.keys():
+        return '{}{}{}'.format(colors[color][0], message, colors[color][1])
+    return message
 
 def parse(expr):
     """
@@ -64,13 +78,13 @@ def apply(op, q):
         try:
             args.append(q.pop())
         except IndexError:
-            print("Not enough arguments in function {}.".format(op.name))
+            print(colorize("AST Render error:\n  Not enough arguments in function '{}'.".format(op.name), 'red'))
     while args:
         op.grow(args.pop())
     q.append(op)
 
 
-def make_AST(tokens, params = []):
+def make_AST(tokens, params=[]):
     """
     Takes a list of infix expression tokens and returns an [Abstrac Syntax Tree](https://en.wikipedia.org/wiki/Abstract_syntax_tree) of this expression using [Shunting-yard algorithm](https://en.wikipedia.org/wiki/Shunting-yard_algorithm).
     """
@@ -79,8 +93,10 @@ def make_AST(tokens, params = []):
 
     parameters = {}
     for p in params:
-        if p in (list(variables.keys()) + list(functions.keys()) + list(parameters.keys())):
-            print("Function parameter ({}) may not be a variable or function name.".format(p))
+        #print(p)
+        #print(list(variables.keys()) + list(functions.keys()) + list(parameters.keys()))
+        if p.split('.')[0] in (list(variables.keys()) + list(functions.keys()) + list(parameters.keys())):
+            print(colorize("Function AST builder error:\n  Parameter {} in function {} may not be a variable or function name.".format(*(p.split('.'))), 'red'))
             raise SyntaxError
         else:
             n = Node(p, lambda x: x, 1)
@@ -121,7 +137,7 @@ def make_AST(tokens, params = []):
             while stack and stack[-1].name != '(':
                 apply(stack.pop(), queue)
             if not stack:
-                print("Shunting yard: syntax error — missing '(' or ','.")
+                print(colorize("Function AST builder error:\n  Missing '(' or ',' in function call.", 'red'))
                 raise SyntaxError           
         
         # Operators priority handling
