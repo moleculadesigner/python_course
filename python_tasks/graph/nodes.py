@@ -8,6 +8,11 @@ Edge = namedtuple('Edge', ['nodes', 'w'])
 ARROW = Arrow(None, None, None)
 EDGE = Edge(frozenset((None,)), None)
 
+def deprecated(fn):
+    def wrapper(*args, **kwargs):
+        raise NotImplementedError("Function {} is broken.".format(fn))
+    return wrapper
+
 
 class Node:
     """
@@ -98,8 +103,7 @@ class UNode(Node):
             node.edges.append(e)
 
 
-
-
+@deprecated
 def merge(edges, method=(lambda x, y: x + y)):
     if not edges:
         return []
@@ -123,12 +127,13 @@ def merge(edges, method=(lambda x, y: x + y)):
 
 if __name__ == '__main__':
     a = UNode('a')
-    b = UNode('b')
+    b = UNode('b', multi=True)
     print(b.children)
 
-    c = UNode('c', [(a, 5), (b, 1), (a, 4)])
+    c = UNode('c', [(a, 5), (b, 1), (a, 4)], multi=True)
     print(b.children)
     b.grow(c, 3)
+    print(a.children)
     print(b.children)
     print(c.children)
     """
