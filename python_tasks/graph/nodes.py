@@ -1,7 +1,5 @@
-import numpy as np
-from collections import namedtuple, defaultdict
+from collections import namedtuple
 from functools import reduce
-import copy as cp
 
 Arrow = namedtuple('Arrow', ['start', 'end', 'w'])
 Edge = namedtuple('Edge', ['nodes', 'w'])
