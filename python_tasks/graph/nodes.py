@@ -200,15 +200,12 @@ class ONode(Node):
         return links
 
 
-
-
-
 @deprecated
 def merge(edges, method=(lambda x, y: x + y)):
     if not edges:
         return []
-    else:
-        edges = cp.deepcopy(edges)
+    #else:
+        #edges = cp.deepcopy(edges)
     t = type(edges[0])
     out = []
     if t is type(EDGE):
