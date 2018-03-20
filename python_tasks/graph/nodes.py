@@ -25,7 +25,7 @@ class Node:
         if name:
             self.name = name
         else:
-            self.name = id(self) % 10000
+            self.name = str(id(self) % 100000)
         self.edges = []
         for node in set(children):
             self.grow(node)
