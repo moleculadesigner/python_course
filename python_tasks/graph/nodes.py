@@ -6,6 +6,18 @@ Edge = namedtuple('Edge', ['nodes', 'w'])
 ARROW = Arrow(None, None, None)
 EDGE = Edge(frozenset((None,)), None)
 
+def extract_nodes(edge):
+    if type(edge) is type(EDGE):
+        if len(edge.nodes) == 1:
+            node = list(edge.nodes).pop()
+            return [node, node]
+        elif len(edge.nodes) == 2:
+            return list(edge.nodes)
+        else:
+            raise ValueError("Invalid edge: {}.".format(edge))
+    if type(edge) is type(ARROW):
+        return [edge.start, edge.end]
+
 def deprecated(fn):
     """Raises a `NotImplementedError` exception
      while attempting to call decorated function."""
@@ -20,8 +32,7 @@ class Node:
     """
     A basic type for graph node representation.
     """
-    def __init__(self, name=None, children=[],
-            content=None):
+    def __init__(self, name=None, children=[], content={}):
         if name:
             self.name = name
         else:
@@ -29,18 +40,32 @@ class Node:
         self.edges = []
         for node in set(children):
             self.grow(node)
-        if content:
-            self.content = content
+        self._content = content
+
+    def _get_content(self):
+        return self._content
+    def _set_content(self, upd_dict:dict):
+        if self._content is None:
+            self._content = dict()
+        upd_dict = dict(upd_dict)
+        for k in upd_dict:
+            self._content[k] = upd_dict[k]        
+    content = property(
+        fget=_get_content,
+        fset=_set_content
+    )
 
     def __repr__(self):
-        return "v.{}".format(self.name)
+        return ".{}".format(self.name)
 
     @property
     def children(self):
-        return set([
-            ((n.pop(), None) if len(n) == 1 else self) for\
-            n in map(lambda x: set(x.nodes) - set((self,)), self.edges)
-        ])
+        ch = []
+        for edge in self.edges:
+            n = extract_nodes(edge)
+            n.remove(self)
+            ch.append(n.pop())
+        return set(ch)
 
     @property
     def deg(self):
@@ -53,6 +78,7 @@ class Node:
         self.edges.append(e)
         if node is not self:
             node.edges.append(e)
+        return e
 
     def drop(self, edge):
         if edge in self.edges:
@@ -83,7 +109,7 @@ class UNode(Node):
             self.grow(node, w)
 
     def __repr__(self):
-        return "o.{}".format(self.name)
+        return "\x1b[33m<>\x1b[0m{}".format(self.name)
 
     @property
     def children(self):
@@ -91,14 +117,12 @@ class UNode(Node):
         all connected nodes and their weights."""
         ch = []
         for e in self.edges:
-            if set((self,)) == e.nodes:
-                ch.append((self, e.w))
-            else:
-                n = set(e.nodes) - set((self,))
-                ch.append((
-                    n.pop(),
-                    e.w
-                ))
+            n = extract_nodes(e)
+            n.remove(self)
+            ch.append((
+                n.pop(),
+                e.w
+            ))
         return ch
 
     @property
@@ -122,6 +146,7 @@ class UNode(Node):
         self.edges.append(e)
         if node is not self:
             node.edges.append(e)
+        return e
 
 
 class ONode(Node):
@@ -137,12 +162,12 @@ class ONode(Node):
             self.grow(node, w)
 
     def __repr__(self):
-        return ">.{}".format(self.name)
+        return "\x1b[35m>>\x1b[0m{}".format(self.name)
 
     @property
     def children(self):
         """Returns list of tuples for
-        all connected nodes and their weights."""
+        all child nodes and their weights."""
         ch = []
         for e in self.edges:
             if e.start is self:
@@ -154,6 +179,8 @@ class ONode(Node):
 
     @property
     def parents(self):
+        """Returns list of tuples for
+        all parent nodes and their weights."""
         p = []
         for e in self.edges:
             if e.end is self:
@@ -184,6 +211,7 @@ class ONode(Node):
         self.edges.append(e)
         if node is not self:
             node.edges.append(e)
+        return e
 
     def drop(self, arrow):
         if arrow in self.edges:
@@ -192,10 +220,10 @@ class ONode(Node):
                 arrow.end.edges.remove(arrow)
 
     def links(self, node):
-        """returns list of edges linking to the `node`"""
+        """returns list of arrows heading to the `node`"""
         links = []
         for a in self.edges:
-            if node in (a.start, a.end):
+            if node is a.end:
                 links.append(a)
         return links
 
