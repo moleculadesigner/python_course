@@ -7,6 +7,12 @@ ARROW = Arrow(None, None, None)
 EDGE = Edge(frozenset((None,)), None)
 
 def extract_nodes(edge):
+    """
+    Return list of nodes connected by `edge`.
+
+    Implemented for maintaining Arrow | Edge
+    polymorphism.
+    """
     if type(edge) is type(EDGE):
         if len(edge.nodes) == 1:
             node = list(edge.nodes).pop()
@@ -17,6 +23,7 @@ def extract_nodes(edge):
             raise ValueError("Invalid edge: {}.".format(edge))
     if type(edge) is type(ARROW):
         return [edge.start, edge.end]
+
 
 def deprecated(fn):
     """Raises a `NotImplementedError` exception
@@ -91,7 +98,7 @@ class Node:
         """returns list of edges linking to the `node`"""
         links = []
         for e in self.edges:
-            if node in e.nodes:
+            if set((self, node)) ==  e.nodes:
                 links.append(e)
         return links
 
@@ -223,7 +230,7 @@ class ONode(Node):
         """returns list of arrows heading to the `node`"""
         links = []
         for a in self.edges:
-            if node is a.end:
+            if self is a.start and node is a.end:
                 links.append(a)
         return links
 

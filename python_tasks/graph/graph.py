@@ -5,7 +5,7 @@ import numpy as np
 EDGE_FORMAT_ERROR = "Wrong edge format. Must be either srting or tuple \
 (str, float)."
 
-MULTI_MODE_ERROR = "Trying to assign more then one edge connecting nodes \
+MULTI_EDGE_ERROR = "Trying to assign more then one edge connecting nodes \
 {} and {} in non-multi graph."
 
 NODE_NOT_IN_GRAPH_ERROR = "Both binding nodes \
@@ -13,6 +13,9 @@ must be in graph. Use add(node) method before bininding."
 
 BOUND_NODE_ADD_ERROR = "Only nodes without edges are allowed to add. \
 Use bind() method for adding edges."
+
+MULTI_MATRIX_ERROR = "Trying to get adjancy matrix from multigraph. \
+This function is not implemented yet due to edge merging ambiguity"
 
 class Graph:
     """
@@ -27,9 +30,9 @@ class Graph:
         self._edges = []
 
         if self.oriented:
-            nd_type = nodes.ONode
+            self._nd_type = nodes.ONode
         else:
-            nd_type = nodes.UNode
+            self._nd_type = nodes.UNode
         adj_type = tuple if self.weighted else str
 
         if multi is None:
@@ -43,7 +46,7 @@ class Graph:
         
         for uname in adjency:
             if uname not in map(lambda n: n.name, self.nodes):
-                U = nd_type(
+                U = self._nd_type(
                     name=uname,
                     multi=self.multi
                 )
@@ -56,14 +59,14 @@ class Graph:
                     raise ValueError(EDGE_FORMAT_ERROR)
                 if adjency[uname].count(child) != 1 and\
                         not self.multi:
-                    raise ValueError(MULTI_MODE_ERROR.format(uname, child))
+                    raise ValueError(MULTI_EDGE_ERROR.format(uname, child))
                 if self.weighted:
                     ch_name, w = child
                 else:
                     ch_name, w = child, None
 
                 if ch_name not in map(lambda n: n.name, self.nodes):
-                    V = nd_type(
+                    V = self._nd_type(
                         name=ch_name,
                         multi=self.multi
                     )
@@ -79,8 +82,6 @@ class Graph:
         nds = ", ".join([str(v) for v in self.nodes])
         eds = ",\n    ".join([str(e) for e in self.edges])
         return "Graph <V, E>:\n   {{{}}}\n   {{{}}}".format(nds, eds)
-
-
         
     @property
     def nodes(self):
@@ -130,6 +131,8 @@ class Graph:
     def add(self, node):
         if node.edges:
             raise ValueError(BOUND_NODE_ADD_ERROR)
+        if type(self._nd_type()) is not type(node):
+            raise TypeError("Inappropriate node type.")
         self.nodes.add(node)
 
     def cut(self, edge):
@@ -149,34 +152,40 @@ class Graph:
         for edge in node1.links(node2):
             self.cut(edge)
 
-
     def __repr__(self):
         return self.__str__()
 
     @property
-    def matrix(self):
-        pass
+    def as_adj_matrix(self):
+        if self.multi:
+            raise NotImplementedError(MULTI_MATRIX_ERROR)
+        nodes = list(self.nodes)
+        _matrix = np.zeros((len(nodes), len(nodes)))
+        for i, nd in enumerate(nodes):
+            for j, cd in enumerate(nodes):
+                es = nd.links(cd)
+                #print("{} {}: {}".format(nd, cd, es))
+                if len(es) == 1:
+                    s = es[0].w
+                    _matrix[i, j] = s if s is not None else 1
+        return nodes, _matrix
+
+    @property
+    def as_dict(self):
+        d = {}
+        for node in self.nodes:
+            d[node.name] = []
+            for e in node.edges:
+                if self.oriented:
+                    if e.start is node:
+                        d[node.name].append((e.end.name, e.w))
+                else:
+                    n = nodes.extract_nodes(e)
+                    n.remove(node)
+                    cd = n[0]
+                    d[node.name].append((cd.name, e.w))
+        return d
 
 
 if __name__ == '__main__':
-    adj = {
-        'A': [('C', 1), ('B', 4), ('A', 5)],
-        'B': [('A', 3), ('D', 0)],
-        'D': [('C', 1)]
-    }
-    G = Graph(
-        adjency=adj,
-        multi=True
-    )
-    print(G)
-
-    O = Graph(
-        adjency=adj,
-        multi=False,
-        oriented=False
-    )
-    print()
-    print(O)
-
-    E = Graph()
-    print('\n{}'.format(E))
+    print("node.py module implements Graph() object.")
