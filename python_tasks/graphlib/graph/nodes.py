@@ -116,7 +116,8 @@ class UNode(Node):
             self.grow(node, w)
 
     def __repr__(self):
-        return "\x1b[33m<>\x1b[0m{}".format(self.name)
+        #return "\x1b[33m<>\x1b[0m{}".format(self.name)
+        return "<>{}".format(self.name)
 
     @property
     def children(self):
@@ -169,7 +170,8 @@ class ONode(Node):
             self.grow(node, w)
 
     def __repr__(self):
-        return "\x1b[35m>>\x1b[0m{}".format(self.name)
+        #return "\x1b[35m>>\x1b[0m{}".format(self.name)
+        return ">>{}".format(self.name)
 
     @property
     def children(self):

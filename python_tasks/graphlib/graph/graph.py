@@ -17,6 +17,9 @@ Use bind() method for adding edges."
 MULTI_MATRIX_ERROR = "Trying to get adjancy matrix from multigraph. \
 This function is not implemented yet due to edge merging ambiguity"
 
+def find_node(graph, node_name:str):
+    return next((u for u in graph.nodes if u.name == node_name))
+
 class Graph:
     """
     """
@@ -52,7 +55,7 @@ class Graph:
                 )
                 self._nodes.add(U)
             else:
-                U = next((u for u in self._nodes if u.name == uname))
+                U = find_node(self, uname)
 
             for child in adjency[uname]:
                 if type(child) is not adj_type:
@@ -72,7 +75,7 @@ class Graph:
                     )
                     self._nodes.add(V)
                 else:
-                    V = next((u for u in self._nodes if u.name == ch_name))
+                    V = find_node(self, ch_name)
 
                 e = U.grow(node=V, weight=w)
                 if e is not None:
@@ -82,7 +85,7 @@ class Graph:
         nds = ", ".join([str(v) for v in self.nodes])
         eds = ",\n    ".join([str(e) for e in self.edges])
         return "Graph <V, E>:\n   {{{}}}\n   {{{}}}".format(nds, eds)
-        
+
     @property
     def nodes(self):
         return self._nodes
@@ -155,12 +158,14 @@ class Graph:
     def __repr__(self):
         return self.__str__()
 
-    @property
-    def as_adj_matrix(self):
+    def adj_matrix(self, nlist=[], disjoined=0):
         if self.multi:
             raise NotImplementedError(MULTI_MATRIX_ERROR)
-        nodes = list(self.nodes)
-        _matrix = np.zeros((len(nodes), len(nodes)))
+        if nlist:
+            nodes = nlist
+        else:
+            nodes = list(self.nodes)
+        _matrix = np.zeros((len(nodes), len(nodes))) + disjoined
         for i, nd in enumerate(nodes):
             for j, cd in enumerate(nodes):
                 es = nd.links(cd)
@@ -184,6 +189,74 @@ class Graph:
                     n.remove(node)
                     cd = n[0]
                     d[node.name].append((cd.name, e.w))
+        return d
+
+    def bellman_ford(self, node_name, loops=False):
+        """
+        If `loops`, we cannot stay in our start node
+        unless it has loop edge. So path from node A to itself
+        will be `([], inf)` if we don't have A -> A edge/arrow.
+
+        Default A -> A path would be `([>>A], 0)` in this case.
+        """
+        # Initialization
+        node = find_node(self, node_name)
+        nlist = [node] + sorted(
+            list(self.nodes - set((node,))),
+            key=lambda n: n.name)
+        shape = len(nlist), len(nlist)
+        A = np.zeros(shape) + np.inf
+        A[0, 0] = 0
+        P = np.zeros(shape, dtype=int)
+        # Making A matrix (weight by edges)
+        for i in range(1, len(nlist)-1):
+            for e in self.edges:
+                u, v = map(nlist.index, nodes.extract_nodes(e))
+                if A[v, i] > A[u, i-1] + e.w:
+                    #print(i, nlist[u], nlist[v] ,A[v, i], A[u, i-1] + e.w)
+                    A[v, i] = A[u, i-1] + e.w
+                    P[v, i] = u
+                if not self.oriented:
+                    v, u = map(nlist.index, nodes.extract_nodes(e))
+                    if A[v, i] > A[u, i-1] + e.w:
+                        #print(i, nlist[u], nlist[v] ,A[v, i], A[u, i-1] + e.w)
+                        A[v, i] = A[u, i-1] + e.w
+                        P[v, i] = u
+        # Path
+        path = {}
+        for i, nd in enumerate(nlist):
+            if nd is node and loops:
+                if node.links(node):
+                    path[nd] = [node], node.links(node)[0].w
+                else:
+                    path[nd] = ([], np.inf)
+                continue
+            jm = (np.argmin(A[i,:]))
+            #print(A[i,jm])
+            weight = A[i,jm]
+            if weight == np.inf:
+                path[nd] = ([], np.inf)
+                continue
+            p = [None for j in range(jm)]
+            for j in range(jm -1, -1, -1):
+                p[j] = nlist[i]
+                i = P[i, j + 1]
+            path[nd] = ([node] + p, weight)
+        return path
+
+    def dijkstra(self, node_name, loops=False):
+        # Initialization
+        node = find_node(self, node_name)
+        nlist = sorted(
+            list(self.nodes - set((node,))),
+            key=lambda n: n.name)
+        lps = sorted(# Start node loop list
+            node.links(node),
+            key=lambda e: e.w)
+        d = {node: 0}
+        for nd in nlist:
+            d[nd] = np.inf
+        
         return d
 
 
