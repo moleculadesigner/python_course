@@ -104,6 +104,9 @@ class Graph:
                     self._edges.append(e)
 
     def __str__(self):
+        """
+        Representation of Graph object
+        """
         nds = ", ".join([str(v) for v in self.nodes])
         eds = ",\n    ".join([str(e) for e in self.edges])
         return "Graph <V, E>:\n   {{{}}}\n   {{{}}}".format(nds, eds)
@@ -143,6 +146,9 @@ class Graph:
         return self._weighted
 
     def join(self, snode, enode, weight=None):
+        """
+        Make an edge with two existing nodes.
+        """
         if not (snode in self.nodes and\
                 enode in self.nodes):
             raise ValueError(NODE_NOT_IN_GRAPH_ERROR)
@@ -154,6 +160,9 @@ class Graph:
             self.edges.append(e)
 
     def add(self, node):
+        """
+        Add an existing node without any edges.
+        """
         if node.edges:
             raise ValueError(BOUND_NODE_ADD_ERROR)
         if type(self._nd_type()) is not type(node):
@@ -170,6 +179,9 @@ class Graph:
         )
 
     def cut(self, edge):
+        """
+        Removes an `edge` from Graph.
+        """
         if edge not in self.edges:
             return None
         parent = nodes.extract_nodes(edge)[0]
@@ -177,12 +189,17 @@ class Graph:
         self.edges.remove(edge)
 
     def remove(self, node):
+        """
+        Removes a `node` with all incident edges from Graph.
+        """
         for edge in node.edges:
-            parent = nodes.extract_nodes(edge)[0]
-            parent.drop(edge)
+            self.cut(edge)
         self.nodes.remove(node)
 
     def disjoin(self, node1, node2):
+        """
+        Removes all edges between two nodes specified
+        """
         for edge in node1.links(node2):
             self.cut(edge)
 
@@ -190,24 +207,33 @@ class Graph:
         return self.__str__()
 
     def adj_matrix(self, nlist=[], disjoined=0):
+        """
+        Returns list of nodes l and adjency matrix A,
+        where Aij = w(l[i], l[j])
+
+        disjoined nodes are weighted as specified in
+        `disjoined` parameter
+        """
         if self.multi:
             raise NotImplementedError(MULTI_MATRIX_ERROR)
         if nlist:
             nodes = nlist
         else:
             nodes = list(self.nodes)
-        _matrix = np.zeros((len(nodes), len(nodes))) + disjoined
+        matrix = np.zeros((len(nodes), len(nodes))) + disjoined
         for i, nd in enumerate(nodes):
             for j, cd in enumerate(nodes):
                 es = nd.links(cd)
-                #print("{} {}: {}".format(nd, cd, es))
                 if len(es) == 1:
                     s = es[0].w
-                    _matrix[i, j] = s if s is not None else 1
-        return nodes, _matrix
+                    matrix[i, j] = s if s is not None else 1
+        return nodes, matrix
 
     @property
     def as_dict(self):
+        """
+        Returns dictionary representation of Graph
+        """
         d = {}
         for node in self.nodes:
             d[node.name] = []
@@ -221,6 +247,7 @@ class Graph:
                     cd = n[0]
                     d[node.name].append((cd.name, e.w))
         return d
+        
 
 if __name__ == '__main__':
     print("node.py module implements Graph() object.")
