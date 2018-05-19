@@ -1,3 +1,10 @@
+"""
+Module utils.py
+
+Implementation of some graph algorithms
+"""
+
+
 import graph
 import nodes
 import numpy as np
@@ -73,6 +80,9 @@ def dijkstra(G, node_name, loops=False):
         key=lambda n: n.name)
 
     def empty_path():
+        """
+        A function for fillind defaults in paths dict
+        """
         return np.inf, []    
     d = defaultdict(empty_path)
     d[node] = 0, [node]
@@ -88,6 +98,11 @@ def dijkstra(G, node_name, loops=False):
                     d[nd][1] + [child]
                 )
 
+    # If `loops`, we cannot stay in our start node
+    # unless it has a loop edge. So path from node A to itself
+    # will be `([], inf)` if we don't have A -> A edge/arrow.
+    #
+    # Default A -> A path would be `([>>A], 0)` in this case.
     if loops: # Root node loop processing
         lps = sorted(# Start node loop list
             node.links(node),
@@ -114,11 +129,16 @@ def matrix_to_graph(A, oriented=True, weighted=True, disjoined=0):
         multi=False
     )
     for i in range(n):
-        G.new(i)
+        G.new(name=i)
 
     def js(i):
+        """
+        Switch upper diagonal / full mode
+        if matrix is unoriented / oriented respectively
+        """
         return range(n) if oriented \
             else range(i, n)
+
     nodes = sorted(
         list(G.nodes),
         key=lambda n: n.name)
