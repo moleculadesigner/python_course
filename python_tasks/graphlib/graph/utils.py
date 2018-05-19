@@ -5,9 +5,6 @@ from heapq import heappush
 
 from collections import defaultdict
 
-def inf():
-    return np.inf
-
 def bellman_ford(G, node_name, loops=False):
     """
     If `loops`, we cannot stay in our start node
@@ -61,35 +58,74 @@ def bellman_ford(G, node_name, loops=False):
         path[nd] = ([node] + p, weight)
     return path
 
+
 def dijkstra(G, node_name, loops=False):
     # Check for negative edges
     for e in G.edges:
         if e.w < 0:
-            raise ValueError("Graph contain negative edges. Dijkstra is impossible.")
+            raise ValueError("""
+            Graph contains negative edges.
+            Dijkstra is impossible.""")
     # Initialization
     node = graph.find_node(G, node_name)
     nlist = [node] + sorted(
         list(G.nodes - set((node,))),
         key=lambda n: n.name)
-    
-    d = defaultdict(inf)
-    d[node] = 0
-        
+
+    def empty_path():
+        return np.inf, []    
+    d = defaultdict(empty_path)
+    d[node] = 0, [node]
+  
     # Main iterations
     while nlist:
         nd = nlist.pop(0)
-        print("Node: {}".format(nd))
+        #print("Node: {}".format(nd))
         for child, w in nd.children:
-            d[child] = min(
-                d[child], d[nd] + w
-            )
+            if d[child][0] > d[nd][0] + w:
+                d[child] = (
+                    d[nd][0] + w,
+                    d[nd][1] + [child]
+                )
 
     if loops: # Root node loop processing
         lps = sorted(# Start node loop list
             node.links(node),
             key=lambda e: e.w)
         if lps:
-            d[node] = lps[0].w
+            d[node] = lps[0].w, [node]
         else:
-            d[node] = np.inf
+            d[node] = empty_path()
     return d
+
+
+def matrix_to_graph(A, oriented=True, weighted=True, disjoined=0):
+    # Matrix test
+    if len(A.shape) != 2:
+        raise ValueError("Inappropriate matrix dimension.")
+    m, n = A.shape
+    if m != n:
+        raise ValueError("Matrix must be square")
+
+    #Graph init
+    G = graph.Graph(
+        oriented=oriented,
+        weighted=weighted,
+        multi=False
+    )
+    for i in range(n):
+        G.new(i)
+
+    def js(i):
+        return range(n) if oriented \
+            else range(i, n)
+    nodes = sorted(
+        list(G.nodes),
+        key=lambda n: n.name)
+    
+    for i in range(n):
+        for j in js(i):
+            if A[i, j] != disjoined:
+                G.join(nodes[i], nodes[j], A[i, j])
+    
+    return G

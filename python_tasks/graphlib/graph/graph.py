@@ -1,6 +1,7 @@
 import nodes
 import numpy as np
 
+deprecated = nodes.deprecated
 # Messages
 EDGE_FORMAT_ERROR = "Wrong edge format. Must be either srting or tuple \
 (str, float)."
@@ -138,6 +139,15 @@ class Graph:
             raise TypeError("Inappropriate node type.")
         self.nodes.add(node)
 
+    def new(self, name=None):
+        """Wrapper to Graph.add().
+        Adds empty node"""
+        self.add(self._nd_type(
+            name=name,
+            multi=self.multi
+            )
+        )
+
     def cut(self, edge):
         if edge not in self.edges:
             return None
@@ -190,7 +200,7 @@ class Graph:
                     cd = n[0]
                     d[node.name].append((cd.name, e.w))
         return d
-
+    @deprecated
     def bellman_ford(self, node_name, loops=False):
         """
         If `loops`, we cannot stay in our start node
@@ -243,7 +253,7 @@ class Graph:
                 i = P[i, j + 1]
             path[nd] = ([node] + p, weight)
         return path
-
+    @deprecated
     def dijkstra(self, node_name, loops=False):
         # Initialization
         node = find_node(self, node_name)

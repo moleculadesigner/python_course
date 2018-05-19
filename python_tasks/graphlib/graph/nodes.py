@@ -26,12 +26,14 @@ def extract_nodes(edge):
 
 
 def deprecated(fn):
-    """Raises a `NotImplementedError` exception
-     while attempting to call decorated function."""
+    """
+    Raises a `NotImplementedError` exception
+    while attempting to call decorated function.
+    """
     def wrapper(*args, **kwargs):
         raise NotImplementedError(
-        """Function {}({}, {}) have not been implemented yet.
-        """.format(fn, args, kwargs))
+        f"""Function {fn}({args}, {kwargs}) have not been implemented yet.
+        """)
     return wrapper
 
 
@@ -40,7 +42,7 @@ class Node:
     A basic type for graph node representation.
     """
     def __init__(self, name=None, children=[], content={}):
-        if name:
+        if name is not None:
             self.name = name
         else:
             self.name = str(id(self) % 100000)

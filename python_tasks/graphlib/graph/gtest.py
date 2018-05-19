@@ -1,7 +1,7 @@
 import graph as g
 import utils as u
 import numpy as np
-
+import datetime
 adj = {
     'A': [('A', 1.4), ('B', 2.5), ('C', 0.3)],
     'B': [('A', 2.5), ('A', 1), ('B', 4), ('D', 0.03)],
@@ -10,13 +10,14 @@ adj = {
     'F': [],
     'G': []
 }
-G = g.Graph(
-    adjency=adj,
-    oriented=True,
-    multi=True
-)
+"""
+A = np.around(2 * (np.random.sample((20, 20))))
+t0 = datetime.datetime.now()
+G = u.matrix_to_graph(A)
+t1 = datetime.datetime.now()
+print(t0,t1,(t1-t0).seconds)
 
-print(G)
+u.dijkstra(G, 1)
 try:
     print("\n{}\n{}\n".format(*(G.adj_matrix(disjoined=np.inf))))
 except NotImplementedError:
@@ -29,13 +30,13 @@ uwadj = {
     'D': ['F']
 }
 P = g.Graph(
-    adjency=uwadj,
-    weighted=False,
-    oriented=False
+    adjency=adj,
+    weighted=True,
+    oriented=True
 )
-
+"""
 print(P)
-print("\n{}\n{}\n".format(*(P.as_adj_matrix)))
+print((P.adj_matrix(disjoined=np.inf)))
 print(P.as_dict)
 """
-print("{}".format(u.dijkstra(G, "B", True)))
+print(u.dijkstra(P, 'A'))
