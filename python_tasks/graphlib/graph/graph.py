@@ -1,7 +1,12 @@
+"""
+graph.py module
+
+Implements Graph object based on `nodes` module
+"""
+
 import nodes
 import numpy as np
 
-deprecated = nodes.deprecated
 # Messages
 EDGE_FORMAT_ERROR = "Wrong edge format. Must be either srting or tuple \
 (str, float)."
@@ -19,13 +24,18 @@ MULTI_MATRIX_ERROR = "Trying to get adjancy matrix from multigraph. \
 This function is not implemented yet due to edge merging ambiguity"
 
 def find_node(graph, node_name:str):
+    """
+    Returns the first node object with name specified.
+    Otherwise raises `StopIteration` exception.
+    """
     return next((u for u in graph.nodes if u.name == node_name))
 
 class Graph:
     """
+    Graph object. Contains set of nodes and list of edges.
     """
 
-    def __init__(self, adjency={},
+    def __init__(self, adjency={}, # Dictionary of node connections
             oriented=True, weighted=True, multi=None):
         self._multi = multi
         self._oriented = oriented
@@ -37,28 +47,37 @@ class Graph:
             self._nd_type = nodes.ONode
         else:
             self._nd_type = nodes.UNode
+        
+        # Unweighted graph sould be created implicitly.
+        # Adjency dictionary must contain only node names in this case.
         adj_type = tuple if self.weighted else str
 
+        # Determining multi graph mode unless specified
         if multi is None:
             for uname in adjency:
                 for child in adjency[uname]:
                     if type(child) is not adj_type:
                         raise ValueError(EDGE_FORMAT_ERROR)
                     if adjency[uname].count(child) != 1:
-                        self.multi = True
+                        self.multi = True # Otherwise leave it None
             self.multi = False
+            # If self.multi is not None, nothing will happen
         
+        # Dictionary to Graph
         for uname in adjency:
             if uname not in map(lambda n: n.name, self.nodes):
+                # Create and add node of appropriate type
                 U = self._nd_type(
                     name=uname,
                     multi=self.multi
                 )
                 self._nodes.add(U)
             else:
+                # Normally there must be only one node with `uname`
                 U = find_node(self, uname)
 
             for child in adjency[uname]:
+                # linking children
                 if type(child) is not adj_type:
                     raise ValueError(EDGE_FORMAT_ERROR)
                 if adjency[uname].count(child) != 1 and\
@@ -69,6 +88,7 @@ class Graph:
                 else:
                     ch_name, w = child, None
 
+                # Creating / finding child node
                 if ch_name not in map(lambda n: n.name, self.nodes):
                     V = self._nd_type(
                         name=ch_name,
@@ -78,6 +98,7 @@ class Graph:
                 else:
                     V = find_node(self, ch_name)
 
+                # Setting up the edge
                 e = U.grow(node=V, weight=w)
                 if e is not None:
                     self._edges.append(e)
@@ -200,75 +221,6 @@ class Graph:
                     cd = n[0]
                     d[node.name].append((cd.name, e.w))
         return d
-    @deprecated
-    def bellman_ford(self, node_name, loops=False):
-        """
-        If `loops`, we cannot stay in our start node
-        unless it has loop edge. So path from node A to itself
-        will be `([], inf)` if we don't have A -> A edge/arrow.
-
-        Default A -> A path would be `([>>A], 0)` in this case.
-        """
-        # Initialization
-        node = find_node(self, node_name)
-        nlist = [node] + sorted(
-            list(self.nodes - set((node,))),
-            key=lambda n: n.name)
-        shape = len(nlist), len(nlist)
-        A = np.zeros(shape) + np.inf
-        A[0, 0] = 0
-        P = np.zeros(shape, dtype=int)
-        # Making A matrix (weight by edges)
-        for i in range(1, len(nlist)-1):
-            for e in self.edges:
-                u, v = map(nlist.index, nodes.extract_nodes(e))
-                if A[v, i] > A[u, i-1] + e.w:
-                    #print(i, nlist[u], nlist[v] ,A[v, i], A[u, i-1] + e.w)
-                    A[v, i] = A[u, i-1] + e.w
-                    P[v, i] = u
-                if not self.oriented:
-                    v, u = map(nlist.index, nodes.extract_nodes(e))
-                    if A[v, i] > A[u, i-1] + e.w:
-                        #print(i, nlist[u], nlist[v] ,A[v, i], A[u, i-1] + e.w)
-                        A[v, i] = A[u, i-1] + e.w
-                        P[v, i] = u
-        # Path
-        path = {}
-        for i, nd in enumerate(nlist):
-            if nd is node and loops:
-                if node.links(node):
-                    path[nd] = [node], node.links(node)[0].w
-                else:
-                    path[nd] = ([], np.inf)
-                continue
-            jm = (np.argmin(A[i,:]))
-            #print(A[i,jm])
-            weight = A[i,jm]
-            if weight == np.inf:
-                path[nd] = ([], np.inf)
-                continue
-            p = [None for j in range(jm)]
-            for j in range(jm -1, -1, -1):
-                p[j] = nlist[i]
-                i = P[i, j + 1]
-            path[nd] = ([node] + p, weight)
-        return path
-    @deprecated
-    def dijkstra(self, node_name, loops=False):
-        # Initialization
-        node = find_node(self, node_name)
-        nlist = sorted(
-            list(self.nodes - set((node,))),
-            key=lambda n: n.name)
-        lps = sorted(# Start node loop list
-            node.links(node),
-            key=lambda e: e.w)
-        d = {node: 0}
-        for nd in nlist:
-            d[nd] = np.inf
-        
-        return d
-
 
 if __name__ == '__main__':
     print("node.py module implements Graph() object.")

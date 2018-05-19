@@ -1,10 +1,23 @@
+"""
+nodes.py module
+Implements some graph node classes:
+
+Node (basic node type, unoriented, unweighted, non-multi)
+|- ONode (oriented, weighted)
+|- UNode (unoriented, weighted)
+"""
+
 from collections import namedtuple
 from functools import reduce
 
+# Edge types
+# Oriented
 Arrow = namedtuple('Arrow', ['start', 'end', 'w'])
-Edge = namedtuple('Edge', ['nodes', 'w'])
 ARROW = Arrow(None, None, None)
+# Unoriented
+Edge = namedtuple('Edge', ['nodes', 'w'])
 EDGE = Edge(frozenset((None,)), None)
+
 
 def extract_nodes(edge):
     """
@@ -20,21 +33,9 @@ def extract_nodes(edge):
         elif len(edge.nodes) == 2:
             return list(edge.nodes)
         else:
-            raise ValueError("Invalid edge: {}.".format(edge))
+            raise ValueError(f"Invalid edge: {edge}.")
     if type(edge) is type(ARROW):
         return [edge.start, edge.end]
-
-
-def deprecated(fn):
-    """
-    Raises a `NotImplementedError` exception
-    while attempting to call decorated function.
-    """
-    def wrapper(*args, **kwargs):
-        raise NotImplementedError(
-        f"""Function {fn}({args}, {kwargs}) have not been implemented yet.
-        """)
-    return wrapper
 
 
 class Node:
@@ -44,13 +45,14 @@ class Node:
     def __init__(self, name=None, children=[], content={}):
         if name is not None:
             self.name = name
-        else:
+        else: # Default name is derived from oject ID
             self.name = str(id(self) % 100000)
         self.edges = []
         for node in set(children):
             self.grow(node)
         self._content = content
 
+    # Handling Node content dictionary
     def _get_content(self):
         return self._content
     def _set_content(self, upd_dict:dict):
@@ -69,18 +71,29 @@ class Node:
 
     @property
     def children(self):
+        """
+        Return a set of tuples: (connected nodes, None)
+        """
         ch = []
         for edge in self.edges:
             n = extract_nodes(edge)
             n.remove(self)
-            ch.append(n.pop())
+            ch.append((n.pop(), None))
         return set(ch)
 
     @property
     def deg(self):
-        return len(self.children)
+        """
+        Node degree (number of incident edges)
+        """
+        return len(self.children) # Because this is always non-multi graph
     
     def grow(self, node, weight=None):
+        """
+        Add an edge to `node` and return it.
+        
+        `weight` is ignored for this case.
+        """
         if node in self.children:
             return None
         e = Edge(frozenset((self, node)), w=None)
@@ -90,6 +103,9 @@ class Node:
         return e
 
     def drop(self, edge):
+        """
+        Removes the `edge` and unpair node and child.
+        """
         if edge in self.edges:
             self.edges.remove(edge)
             node = edge.nodes - set((self,))
@@ -97,7 +113,7 @@ class Node:
                 node.pop().edges.remove(edge)
 
     def links(self, node):
-        """returns list of edges linking to the `node`"""
+        """returns list of edges linking to the `node`."""
         links = []
         for e in self.edges:
             if set((self, node)) ==  e.nodes:
@@ -108,9 +124,12 @@ class Node:
 class UNode(Node):
     """
     A node in unoriented graph.
+
+    Can be weighted, allow multi graph junctions and loops.
     """
     def __init__(self, name=None, children=[],
             multi=False, content=None):
+        # UNode is a successor of simple Node
         Node.__init__(self, name=name, content=content)
         self.multi = multi
         self.edges = []
@@ -118,7 +137,6 @@ class UNode(Node):
             self.grow(node, w)
 
     def __repr__(self):
-        #return "\x1b[33m<>\x1b[0m{}".format(self.name)
         return "<>{}".format(self.name)
 
     @property
@@ -142,13 +160,16 @@ class UNode(Node):
 
         deg(v) = sum(w(e | e is incident to v))
         """
-        return reduce(lambda x, y: x + y[1],
-                      self.children, 0)
+        return reduce(
+            lambda x, y: x + y[1],
+            self.children, 0)
 
     def grow(self, node, weight=1):
         """
         Addes edge to `node` with `weight`. If `node` is already linked
         does nothing, unless you are in multigraph mode.
+
+        Return edge created.
         """
         if not self.multi and node in map(lambda x: x[0], self.children):
             return None
@@ -172,7 +193,6 @@ class ONode(Node):
             self.grow(node, w)
 
     def __repr__(self):
-        #return "\x1b[35m>>\x1b[0m{}".format(self.name)
         return ">>{}".format(self.name)
 
     @property
@@ -231,7 +251,11 @@ class ONode(Node):
                 arrow.end.edges.remove(arrow)
 
     def links(self, node):
-        """returns list of arrows heading to the `node`"""
+        """
+        Returns list of arrows heading to the `node`
+        
+        `self` -> `node` only
+        """
         links = []
         for a in self.edges:
             if self is a.start and node is a.end:
@@ -239,29 +263,8 @@ class ONode(Node):
         return links
 
 
-@deprecated
-def merge(edges, method=(lambda x, y: x + y)):
-    if not edges:
-        return []
-    #else:
-        #edges = cp.deepcopy(edges)
-    t = type(edges[0])
-    out = []
-    if t is type(EDGE):
-        for i, e in enumerate(edges):
-            weight = e.w
-            if e is EDGE:
-                continue
-            for j, ee in enumerate(edges[i+1:]):
-                if e.nodes == ee.nodes:
-                    weight = method(weight, ee.w)
-                    edges[i + j + 1] = EDGE
-            out.append(Edge(e.nodes, weight))
-        del(edges)
-        return out
-
-
 if __name__ == '__main__':
+    # Some demo
     a = ONode('a')
     b = ONode('b')
     print(b.children)
