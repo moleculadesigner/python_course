@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 from copy import deepcopy
 
-A = np.around(2 * (np.random.sample((4, 4)) - 0.5))
+A = np.around(0.75*(np.random.sample((8, 8))))
 W = A + A.T - 2 * np.diag(A.diagonal())
 U = deepcopy(W)
 W[np.where(W == 0)] = np.inf
@@ -49,7 +49,7 @@ def path_BF(W, s, i):
     return p
 
 print("W:\n{}\n".format(W))
-bellman_ford(W, True)
+bellman_ford(W)
 s = []
 for i, j in [(i, j) for i in range(W.shape[0]) for j in range(W.shape[0])]:
     s.append("({}, {}): {}".format(i, j, path_BF(W, i, j)))
@@ -59,7 +59,6 @@ print("\n".join(s))
 def main():
     G = nx.from_numpy_matrix(U)
     nx.draw(G, with_labels=True)
-    nx.draw_networkx_edge_labels(G,  pos=nx.spring_layout(G))
     plt.show()
     return 0
 
